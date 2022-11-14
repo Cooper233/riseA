@@ -23,70 +23,99 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class RAstate implements Cloneable {
-    public List<String> lores = new LinkedList<>();
-    public double critChance;
-    public double critRate;
-    public double headshotRate;
-    public boolean nonHeadshot;
-    public double damage;
-    public double finalDamage;
-    public double trueDamage;
-    public double hp;
-    public double hpRegen;
-    public double percentHp;
-    public double physicalResistance;
-    public double specialResistance;
-    public double physicalPiercing;
-    public double speed;
-    public double percentDamage;
-    public double hit;
-    public double avoid;
-    public double expBounce;
-    public double onKillRegen;
-    public double nfAbility;
-    public double debuffResistance;
-    public double damageReceive;
-    public double skillLevel;
-    public double skillDamage;
-    public double debuffEffect;
-    public double recoverEffect;
-    public double skillAccelerate;
-    public double pulseResistance;
-    private double totalExHp;
+    public List<String> floatingLore = new LinkedList<>();
+    public List<String> staticLore = new LinkedList<>();
+
+    public Map<Attr, Double> attrMap = new HashMap<>();
     public boolean downed;
     public boolean applied = false;
+    public boolean nonHeadshot = false;
+    public Map<String, ElementAttr> elementAttrMap = new HashMap<>();
+    public Map<String, Integer> suitNum = new HashMap<>();
+
 
     @Override
-    public RAstate clone() {
-        try {
-            RAstate clone = (RAstate) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+    public UDState clone() {
+        UDState clone = new UDState();
+        // TODO: copy mutable state here, so the clone can't change the internals of the original
+        clone.applied = applied;
+        for (Attr i : attrMap.keySet()) {
+            clone.attrMap.put(i, attrMap.get(i));
         }
+        clone.downed = downed;
+        clone.floatingLore = floatingLore;
+        clone.staticLore = staticLore;
+        return clone;
     }
 
-    public static class extraHp implements Cloneable {
-        public long disappear;
-        public double left;
+    public void setAttr(Attr tar, double val) {
+        attrMap.put(tar, val);
+    }
 
-        public extraHp(double val, long delay)//delay以毫秒为单位
-        {
-            left = val;
-            disappear = System.currentTimeMillis() + delay;
-        }
+    public double getAttr(Attr tar) {
+        return attrMap.get(tar);
+    }
 
-        @Override
-        public extraHp clone() {
-            try {
-                extraHp clone = (extraHp) super.clone();
-                // TODO: copy mutable state here, so the clone can't change the internals of the original
-                return clone;
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError();
-            }
-        }
+    public void addAttr(Attr tar, double val) {
+        attrMap.put(tar, getAttr(tar) + val);
+    }
+
+    public void setSuitNum(String tar, int val) {
+        suitNum.put(tar, val);
+    }
+
+    public int getSuitNum(String tar) {
+        return suitNum.getOrDefault(tar, 0);
+    }
+
+    public void addSuitNum(String tar) {
+        suitNum.put(tar, getSuitNum(tar) + 1);
+    }
+
+    public ElementAttr getElementAttr(String e) {
+        return elementAttrMap.get(e);
+    }
+
+    public void setElementAttr(String e, ElementAttr val) {
+        elementAttrMap.put(e, val);
+    }
+
+    public void AllDefault() {
+        setAttr(CRIT_CHANCE, 0);
+        setAttr(CRIT_RATE, 0);
+        setAttr(HEADSHOT_RATE, 0);
+        nonHeadshot = false;
+        setAttr(DAMAGE, 0);
+        setAttr(RESISTANCE, 0);
+        setAttr(ARMOR, 0);
+        setAttr(ARMOR_BREAK_PERCENT, 0);
+        setAttr(RESISTANCE, 0);
+        setAttr(FINAL_DAMAGE, 0);
+        setAttr(PERCENT_DAMAGE, 0);
+        setAttr(HP, 0);
+        setAttr(HP_PERCENT, 0);
+        setAttr(HP_REGEN, 0);
+        setAttr(HP_REGEN_PERCENT, 0);
+        setAttr(SPEED, 0);
+        setAttr(ATTACK_SPEED, 0);
+        setAttr(SKILL_DAMAGE, 0);
+        setAttr(SKILL_ACCELERATE, 0);
+        setAttr(SKILL_LEVEL, 0);
+        setAttr(DEBUFF_EFFECT, 0);
+        setAttr(RECOVER_EFFECT, 0);
+        setAttr(AVOID_RATE, 0);
+        setAttr(AVOID_BREAK_RATE, 0);
+        setAttr(BLOCK_RATE, 0);
+        setAttr(BLOCK_BREAK_RATE, 0);
+        setAttr(ATTACK_VAMPIRE, 0);
+        setAttr(LIFE_STEAL, 0);
+        setAttr(FINAL_DAMAGE_ALL, 0);
+        setAttr(FINAL_RESISTANCE_ALL, 0);
+        setAttr(RECOVER_ON_KILL, 0);
+        setAttr(RECOVER_ON_KILL_PERCENT, 0);
+        staticLore.clear();
+        floatingLore.clear();
+        applied = false;
     }
 
     public Map<PotionEffectType, Integer> potions = new HashMap<>();
