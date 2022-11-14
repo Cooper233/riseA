@@ -1,0 +1,108 @@
+复原链接:
+  name: "初级超频模块"
+  cd: 50
+  cd-tpye: "Recover"
+  cd-decrease: 5
+  effect:
+    1:
+      type: POTION
+      id: 10
+      duration: 30
+      duration-increase: 10
+      level: 0
+      level-lv3: 1
+      target: SELF
+    2:
+      type: ATTR
+      id: FINAL_DAMAGE
+      duration: 10
+      duration-increase: 5
+      val: 5
+      val-type: PLUS
+      val-increase: 10
+      aggressive: false
+      target: SELF
+    3:
+      type: EXHP
+      duration: 20
+      duration-increase: 5
+      val: 100
+      val-increase: 10
+      target: SELF
+  onEnable:
+    message: "§f[§6ISAAC§f]已启用初级超频协议"
+  resist:
+    time: 10
+    type: "Recover"
+震爆脉冲:
+  name: "震爆脉冲"
+  cd: 1
+  cd-type: "test"
+  effect:
+    1:
+      type: DAMAGE
+      damage: 20
+      damage-increase: 20
+      hit: 10
+      target: AROUND
+      target-data:
+        length: 5
+        num: 100
+        blacklist: [ NPC_FRIEND,PLAYER ]
+        angle:
+          - "0-30"
+          - "330-360"
+  onEnable:
+    message: "§f[§6ISAAC§f]震爆脉冲已释放"
+    particle: DIRECT_PULSE
+    sound: modularwarfare:tac50
+
+    color:
+      - 0
+      - 1
+脉冲扫描:
+  name: "脉冲扫描"
+  cd: 1
+  cd-type: "test"
+  effect:
+    1:
+      type: ATTR
+      id: DAMAGE_RECEIVE
+      duration: 20
+      duration-increase: 5
+      val: 0.05
+      val-type: PLUS
+      val-increase: 10
+      aggressive: true
+      target: AROUND
+      target-data:
+
+        length: 5
+        num: 100
+    2:
+      type: STACK
+      id: PULSE_AFFECT
+      val: 100
+      target: AROUND
+      target-data:
+        blacklist: [ NPC_FRIEND,PLAYER ]
+        length: 5
+        num: 100
+    3:
+      type: POTION
+      id: 24
+      duration: 50
+      duration-increase: 10
+      level: 0
+      target: AROUND
+      target-data:
+        blacklist: [ NPC_FRIEND,PLAYER ]
+        length: 5
+        num: 100
+  onEnable:
+    message: "§f[§6ISAAC§f]已对附近进行扫描"
+    particle: PULSE
+    sound: modularwarfare:tac50
+    color:
+      - 1
+      - 0

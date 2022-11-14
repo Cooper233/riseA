@@ -1,0 +1,8 @@
+name: riseA
+main: org.rise.riseA
+version: 1.0.0-SNAPSHOT
+softdepend: [ CleanroomGenerator,MythicMobs ]
+commands:
+  rsa:
+    description: rsa
+    usage: /<command>

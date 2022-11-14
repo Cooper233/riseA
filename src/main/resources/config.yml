@@ -1,0 +1,473 @@
+critChance: 暴击几率
+critChanceMax: 80
+critRate: 暴击伤害
+critRateMin: 0
+critRateDefault: 20
+critRateMax: 250
+headshotRate: 爆头伤害
+headshotRateDefault: 20
+nonHeadshot: 无法被爆头
+damage: 攻击力
+finalDamage: 总伤害
+finalDamageMax: 3000
+trueDamage: 真实伤害
+trueDamageMax: 5000
+hp: 生命值
+percentHp: 总生命值
+HpRegen: 生命值恢复
+HpRegenMax: 80
+physicalResistance: 物理抗性
+physicalMax: 1000
+physicalPiercing: 物理穿透
+physicalPiercingMax: 1000
+specialResistance: 特殊防护
+avoidRate: 闪避
+avoidRateMax: 200
+hitRate: 命中
+hitRateMax: 500
+hitRateDefault: 15
+speed: 移动速度
+speedMax: 100
+percentDamage: 百分比伤害
+percentDamageMax: 400
+expBounce: 经验获得量
+onKillRegen: 击杀时恢复
+nfAbility: 夜战能力
+debuffResistance: 异常抗性
+extraHpMax: 2000
+skillLevel: 技能分阶
+skillDamage: 技能伤害
+debuffEffect: 状态效果
+recoverEffect: 修复效能
+skillAccelerate: 技能加速
+skillBaseLevel: 架构等级
+pulseResistance: 脉冲抗性
+explosiveDamage: 爆裂物伤害
+skillDuration: 技能持续时间
+
+
+buffGiver: 装备时
+suitMark: §e套装>
+overCharge: §4过量>
+typeBuff: §e对类型
+typeMark: "§6╟§f装备标识: §7"
+healthBuff: §f当生命
+talent: "§f§n装备天赋"
+refitMark: "§6╟§f改装类型: §7"
+levelMark: ">§f装备分阶:"
+calibratedMark: "§e[已校准]"
+
+downed: modularwarfare:effect.downed
+needRevive: modularwarfare:effect.needrevive
+revived: modularwarfare:effect.revived
+protect: modularwarfare:effect.protect
+killed: modularwarfare:effect.killed
+refit: modularwarfare:effect.refit
+
+
+activeSound:
+  GEL_RECOVER: modularwarfare:effect.revived
+  PLATFORM_RECOVER: modularwarfare:effect.tac50
+  PULSE_SCAN: modularwarfare:effect.pulse_scan
+  BFB_FLASH: modularwarfare:effect.bfb_flash
+  Pulse_EMP_Prepare: modularwarfare:effect.pulse_emp_prepare
+  Pulse_EMP_Release: modularwarfare:effect.pulse_emp_release
+
+binding: "§c绑定: §f"
+notBelong: "§f[§6ISAAC§f] §c警告！无法捡起不属于自己的物品！"
+
+npc-friend: [ 0 ]
+npc-enemy: [ 2,3 ]
+npc-elc:
+  - 先锋无人机
+  - 锯齿小车
+
+
+moduleTitle: "§6ISAAC§f作战增幅模块"
+module1: "ISAAC主系统增幅"
+module2: "ISAAC泛用型接口"
+module3: "ISAAC额外增幅槽位"
+moduleSkill: "ISAAC战术技能"
+moduleName: "§6IASAC§f作战增幅模块"
+moduleDescribe:
+  - "§7ISAAC作战增幅模块是一个全新的武器强化方式"
+  - "§7它为你提供了一个额外的物品栏，你可以在对"
+  - "§7应槽位放入对应型号的增幅模块以获得强化"
+  - "§7槽位（从左至右）对应的型号："
+  - "§71号：§6ISAAC§b主系统§f增幅"
+  - "§72号：§6ISAAC§9泛用型§f接口"
+  - "§73号：§6ISAAC§e额外增幅§f槽位"
+  - "§7ISAAC战术技能是可以通过按键释放的主动技能，"
+  - "§7默认Q释放1号技能，T释放2号技能"
+  - "§7上：§6ISAAC§c1号战术技能"
+  - "§7下：§6ISAAC§c2号战术技能"
+moduleError: "§cISSAC无法识别此增幅模块！"
+moduleShift: "§cISSAC不支持快速装备！"
+
+pressSkill:
+  无言杀意: "§c[§f§l无言杀意§c]"
+  KIMERA: "§c[§f§lKIMERA§c]"
+  砥砺刀锋: "§c[§f§l砥砺刀锋§c]"
+
+description:
+  CRIT:
+    - §f每次攻击时触发致命攻击的几率。
+    - §f上限：§680%
+  CRIT_RATE:
+    - §f触发致命攻击时增加的伤害。
+    - §f基础：§620%
+    - §f上限：§6250%
+  HEADSHOT_RATE:
+    - §f击中头部时增加的伤害。
+    - §f基础：§620%
+  DAMAGE:
+    - §f武器可造成的伤害。
+  FINAL_DAMAGE:
+    - §f武器伤害的增加量。
+    - §f上限：§63000%
+  TRUE_DAMAGE:
+    - §f武器可造成的不会被护甲属性减免的伤害量。
+    - §f上限：§63000
+  HP:
+    - §f增加的生命值。
+  HP_REGEN:
+    - §f每秒恢复的生命值。
+    - §f上限：§625
+  PERCENT_HP:
+    - §f生命值百分比上升的值。
+  PHYSICAL_RESISTANCE:
+    - §f等值减少伤害。
+    - §f上限：§61000
+  SPECIAL_RESISTANCE:
+    - §f百分比减少承受的伤害。
+  PHYSICAL_PIERCING:
+    - §f攻击时等值减少对方的物理抗性。
+    - §f上限：§61000
+  SPEED:
+    - §f速度的增加值。
+    - §f上限：§6100%
+  PERCENT_DAMAGE:
+    - §f攻击时造成对方生命值百分比的伤害的值。
+    - §f上限：§6400
+  HIT:
+    - §f命中值。命中越高，越容易在攻击时击中对方。
+    - §f基础：§615
+    - §f上限：§6500
+  AVOID:
+    - §f闪避值。闪避越高，越不容易在被攻击时被击中。
+    - §f上限：§6200
+  EXP_BOUNCE:
+    - §f捡拾经验球时获得的增幅
+  ON_KILL_REGEN:
+    - §f攻击时击杀对方后恢复的百分比生命值。
+  NF_ABILITY:
+    - §f百分比减少低亮度环境下的命中减益。
+    - §f上限：§6100%
+  DEBUFF_RESISTANCE:
+    - §f在受到异常状态（药水效果、属性降低等）影响时的抵抗能力。
+  DAMAGE_RECEIVE:
+    - §f在被攻击时的伤害比例。
+    - §f默认：§61
+  SKILL_LEVEL:
+    - §f主动技能的等级。等级越高，主动技能的效果越强力。
+    - §f基础：§60
+  SKILL_DAMAGE:
+    - §f主动技能造成的伤害比例。
+    - §f基础：§61
+  DEBUFF_EFFECT:
+    - §f异常效果的影响比例（持续时间，影响效果等）。
+    - §f基础：§61
+  RECOVER_EFFECT:
+    - §f在受到增益/恢复时的影响比例（持续时间，影响效果等）。
+    - §f基础：§61
+  SKILL_ACCELERATE:
+    - §f技能冷却进程的加速比例。
+    - §f基础：§61
+  PULSE_RESISTANCE:
+    - §f减少脉冲影响的持续时间。
+    - §f基础：§630%
+
+
+
+typeList:
+  狙击枪:
+    - '狙击枪'
+    - '栓动式狙击步枪'
+    - '反器材狙击步枪'
+  冲锋枪:
+    - '冲锋枪'
+    - '稳定性冲锋枪'
+    - '速射型冲锋枪'
+  突击步枪:
+    - '突击步枪'
+    - '速射突击步枪'
+  精准射手步枪:
+    - '精准射手步枪'
+  霰弹枪:
+    - '霰弹枪'
+    - '泵动式霰弹枪'
+    - '全自动式霰弹枪'
+  弩:
+    - '弩'
+    - '战术弩'
+    - '重型弩'
+  机枪:
+    - '机枪'
+    - '速射轻机枪'
+    - '转轮轻机枪'
+  手枪:
+    - '手枪'
+    - '重手枪'
+  近战武器:
+    - '近战武器'
+    - '轻型近战武器'
+    - '重型近战武器'
+  老式武器:
+    - '老式后装药式步枪'
+    - '老式自动步枪'
+    - '老式燧发火枪'
+  发射器:
+    - '榴弹发射器'
+    - '导弹发射器'
+  火炮:
+    - '火力支援平台'
+    - '火炮'
+    - '定向导弹发射器'
+    - '聚变发射器'
+  CA制式装备:
+    - 'CALISTA武器系统'
+  CA叛变协议:
+    - 'CHAOS叛变协议'
+  盾牌:
+    - '盾牌'
+  无尽锻造:
+    - '无尽锻造'
+  轻型枪械:
+    - '轻型枪械'
+  普通装备:
+    - 普通装备
+  头盔:
+    - 头盔
+  胸甲:
+    - 胸甲
+  枪套:
+    - 枪套
+  护膝:
+    - 护膝
+  背包:
+    - 背包
+  胸挂:
+    - 胸挂
+  戴尔斯纳:
+    - 戴尔斯纳
+  东方光能:
+    - 东方光能
+  戈蓝瑞亚:
+    - 戈蓝瑞亚
+  哈尔贝斯:
+    - 哈尔贝斯
+  荒野狩猎:
+    - 荒野狩猎
+  拉斯提摩:
+    - 拉斯提摩
+  猎人之眼:
+    - 猎人之眼
+  玛瑙哈瑙:
+    - 玛瑙哈瑙
+  迷雾控制权:
+    - 迷雾控制权
+  清川得里奇:
+    - 清川得里奇
+  瑞克希尔:
+    - 瑞克希尔
+  耶尔声纳:
+    - 耶尔声纳
+  韵穆阀门:
+    - 韵穆阀门
+  SPANK:
+    - SPANK
+  Tech115:
+    - Tech115
+
+
+secAbleType:
+  - "盾牌"
+
+suits:
+  Guardian:
+    Symbol: "守护者"
+    Attr:
+      2:
+        - "攻击力+20"
+  Barrier:
+    Symbol: "最终壁垒"
+    Attr:
+      2:
+        - 命中+5
+        - 夜战能力+20
+      3:
+        - 击杀时恢复+5
+        - 护甲+5
+        - 生命恢复+2
+      4:
+        - §f§n装备天赋
+        - 最终壁垒
+  Frontline:
+    Symbol: "前线防护"
+    Attr:
+      2:
+        - 命中+10
+      3:
+        - 命中+15
+        - 异常抗性+10%
+        - 移动速度§6§c-10%
+      4:
+        - §f§n装备天赋
+        - 鼓起勇气
+  rick:
+    Symbol: 瑞克希尔
+    Attr:
+      1:
+        - §e对类型手枪 总伤害+10%
+      2:
+        - 命中+20
+      3:
+        - 夜战能力+40%
+  quin:
+    Symbol: 清川得里奇
+    Attr:
+      1:
+        - §e对类型霰弹枪 总伤害+10%
+      2:
+        - 击杀时回复+5%
+      3:
+        - §e对类型机枪 总伤害+10%
+  spank:
+    Symbol: SPANK
+    Attr:
+      1:
+        - 生命值+20
+      2:
+        - 物理抗性+10
+      3:
+        - §e对类型突击步枪 总伤害+20%
+  dell:
+    Symbol: 戴尔斯纳
+    Attr:
+      1:
+        - §e对类型冲锋枪 总伤害+10%
+      2:
+        - 夜战能力+20%
+      3:
+        - 暴击伤害+20%
+  lasdimo:
+    Symbol: 拉斯提摩
+    Attr:
+      1:
+        - §e对类型狙击枪 总伤害+15%
+      2:
+        - 命中+15
+      3:
+        - 暴击伤害+20%
+  wild:
+    Symbol: 荒野狩猎
+    Attr:
+      1:
+        - 暴击几率+15%
+      2:
+        - 闪避+8
+      3:
+        - 特殊防护+5
+  hunter:
+    Symbol: 猎人之眼
+    Attr:
+      1:
+        - §e对类型精确射手步枪 总伤害+15%
+      2:
+        - 致命伤害+15%
+      3:
+        - 物理穿透+10
+  T115:
+    Symbol: Tech115
+    Attr:
+      1:
+        - 物理抗性+5
+      2:
+        - 总生命值+5%
+      3:
+        - 异常抗性+20%
+  yell:
+    Symbol: 耶尔声纳
+    Attr:
+      1:
+        - 异常抗性+10%
+      2:
+        - 修复效能+10%
+      3:
+        - 脉冲抗性+40%
+  mica:
+    Symbol: 韵穆阀门
+    Attr:
+      1:
+        - 生命值恢复+2
+      2:
+        - 生命值+45
+      3:
+        - 修复效能+15%
+  light:
+    Symbol: 东方光能
+    Attr:
+      1:
+        - 技能伤害+15%
+      2:
+        - 状态效果+15%
+      3:
+        - 技能加速+15%
+  golan:
+    Symbol: 戈蓝瑞亚
+    Attr:
+      1:
+        - 修复效能+10%
+      2:
+        - 状态效果+15%
+      3:
+        - 技能加速+15%
+  agate:
+    Symbol: 玛瑙哈瑙
+    Attr:
+      1:
+        - 技能加速+10%
+      2:
+        - 状态效果+20%
+      3:
+        - 技能伤害+15%
+  hall:
+    Symbol: 哈尔贝斯
+    Attr:
+      1:
+        - 技能加速+10%
+      2:
+        - 修复效能+15%
+      3:
+        - 状态效果+20%
+  miku:
+    Symbol: 迷雾控制权
+    Attr:
+      1:
+        - 技能持续时间+30%
+      2:
+        - 技能加速 +20%
+      3:
+        - 修复技能 +30%
+  craftsman:
+    Symbol: 至高匠人
+    Attr:
+      2:
+        - §e对类型无尽锻造 总伤害+15%
+      3:
+        - 击杀时恢复+5%
+        - 移动速度+10%
+        - 生命值+20
+      4:
+        - §f§n装备天赋
+        - 铤而走险

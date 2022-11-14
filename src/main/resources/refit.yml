@@ -1,0 +1,472 @@
+typeList:
+  - '突击步枪'
+  - '狙击枪'
+  - '冲锋枪'
+  - '精准射手步枪'
+  - '霰弹枪'
+  - '机枪'
+  - '手枪'
+  - '普通装备'
+  - '头盔'
+  - '胸甲'
+  - '枪套'
+  - '护膝'
+  - '胸挂'
+  - '背包'
+
+refit:
+  武器核心槽位:
+    mark: "§w§6§l>改装槽位:§7武器核心槽位"
+    prefix: "§w§6"
+    slot:
+      突击步枪:
+        - "FINAL_DAMAGE-0-15-true"
+        - "DAMAGE-0-25-false"
+      狙击枪:
+        - "FINAL_DAMAGE-0-15-true"
+        - "HEADSHOT_RATE-20-115-true"
+      冲锋枪:
+        - "FINAL_DAMAGE-0-15-true"
+        - "CRIT-0-21-true"
+      精准射手步枪:
+        - "TRUE_DAMAGE-0-25-false"
+        - "FINAL_DAMAGE-0-15-true"
+      霰弹枪:
+        - "FINAL_DAMAGE-0-15-true"
+        - "DAMAGE-0-4-false"
+      机枪:
+        - "FINAL_DAMAGE-0-15-true"
+        - "DAMAGE-0-20-false"
+      手枪:
+        - "FINAL_DAMAGE-0-15-true"
+
+  武器额外槽位:
+    mark: "§w§e§l>改装槽位:§7武器额外槽位"
+    prefix: "§w§e"
+    slot:
+      突击步枪:
+        - "CRIT-0-9.5-true"
+        - "CRIT_RATE-0-10-true"
+        - "HEADSHOT_RATE-0-10-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-10-false"
+        - "SPEED-0-15-true"
+        - "NF_ABILITY-0-35-true"
+      狙击枪:
+        - "CRIT-0-9.5-true"
+        - "PERCENT_DAMAGE-0-5-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-30-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+      冲锋枪:
+        - "CRIT_RATE-0-10-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-10-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+      精准射手步枪:
+        - "CRIT-0-9.5-true"
+        - "CRIT_RATE-0-10-true"
+        - "HEADSHOT_RATE-5-50-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-20-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+      霰弹枪:
+        - "CRIT-0-13.5-true"
+        - "CRIT_RATE-0-10-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-10-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+      机枪:
+        - "CRIT-0-9.5-true"
+        - "CRIT_RATE-0-10-true"
+        - "HEADSHOT_RATE-0-10-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-10-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+      手枪:
+        - "CRIT-0-9.5-true"
+        - "CRIT_RATE-0-10-true"
+        - "HEADSHOT_RATE-0-25-true"
+        - "HIT-0-20-false"
+        - "ARMOR_BREAK-0-10-false"
+        - "SPEED-0-15-true"
+        - "ON_KILL_REGEN-0-7-true"
+        - "NF_ABILITY-0-35-true"
+  装备核心槽位:
+    mark: "§e§6§l>改装槽位:§7装备核心槽位"
+    prefix: "§e§6"
+    slot:
+      普通装备:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      头盔:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      胸甲:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      枪套:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      护膝:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      胸挂:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+      背包:
+        - "HP-0-50-false"
+        - "FINAL_DAMAGE-0-15-true"
+        - "SKILL_LEVEL-1-1-false"
+  装备额外槽位:
+    mark: "§e§e§l>改装槽位:§7装备额外槽位"
+    prefix: "§e§e"
+    slot:
+      普通装备:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      头盔:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      胸甲:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      护膝:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      枪套:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      胸挂:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+      背包:
+        - "CRIT-0-6-true"
+        - "CRIT_RATE-0-12-true"
+        - "HEADSHOT_RATE-0-12-true"
+        - "HP_REGEN-1-1.5-false"
+        - "ARMOR-0-10-false"
+        - "SPEED-0-6-true"
+        - "AVOID-0-7-false"
+        - "EXP_BOUNCE-0-10-true"
+        - "NF_ABILITY-0-12-true"
+        - "DEBUFF_RESISTANCE-0-10-true"
+        - "SKILL_DAMAGE-0-10-true"
+        - "DEBUFF_EFFECT-0-12-true"
+        - "RECOVER_EFFECT-0-20-true"
+        - "SKILL_ACCELERATE-0-10-true"
+calibration:
+  突击步枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  狙击枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  冲锋枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  精准射手步枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  霰弹枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  机枪:
+    1:
+      res_metal: 5
+      res_elec: 3
+    2:
+      res_metal: 15
+      res_elec: 12
+    3:
+      res_metal: 34
+      res_elec: 30
+    4:
+      res_metal: 49
+      res_elec: 43
+    5:
+      res_metal: 69
+      res_elec: 61
+  手枪:
+    1:
+      res_metal: 3
+      res_elec: 2
+    2:
+      res_metal: 10
+      res_elec: 9
+    3:
+      res_metal: 28
+      res_elec: 24
+    4:
+      res_metal: 41
+      res_elec: 38
+    5:
+      res_metal: 52
+      res_elec: 48
+talent:
+  mark: "§6<§f§l可用天赋槽位§6>"
+  prefix: "§6§n╟§f§n装备天赋§8§n                        "
+  slot:
+    突击步枪: [ KILLER,MAINTAIN,PRESSURE,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,ASYSTOLE ]
+    狙击枪: [ KILLER,MAINTAIN,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,FIRST_BLOOD ]
+    冲锋枪: [ KILLER,MAINTAIN,PRESSURE,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,OUTSIDER ]
+    精准射手步枪: [ KILLER,MAINTAIN,PRESSURE,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,FIRST_BLOOD ]
+    霰弹枪: [ KILLER,MAINTAIN,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,PUNCH ]
+    机枪: [ KILLER,MAINTAIN,PRESSURE,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO,PUNCH ]
+    手枪: [ KILLER,MAINTAIN,PRESSURE,CLOSE_COMBAT,SADISM,REVENGE,RANGER,STEADY,PRICK,PERMANENCE,REVOLT,FUTURE,SYNCHRO ]
+    头盔: [ PROTECT,HEMOPHAGIA,ALERT,UNSTOPPABLE,SHOCK,ADRENALINE ]
+    胸甲: [ UNBREAKABLE,GLASS_CANNON,OBLITERATIVE,HEAD_HUNTER ]
+  description:
+    RANGER:
+      - §7你与目标的距离每§62§7格额外造成§63%§7伤害。
+    CLOSE_COMBAT:
+      - §7击杀§65§7格以内敌人获得 §6总伤害+30% §7，持
+      - §7续§610§7秒。§610§7秒内无法重复获得效果。
+    REVENGE:
+      - §7击杀受到§6异常状态效果§7影响的敌人会赋予
+      - §7你与队友 §6致命伤害+15% §7和 §6致命几率+15%
+      - §7持续§620§7秒。§620§7秒内无法重复获得效果。
+    SADISM:
+      - §7对带有§6缓慢§7药水效果的敌人额外造成§620%§7
+      - §7伤害。
+      - §7击杀§64§7名敌人后，对下一次击中的敌人赋予
+      - §7§6缓慢§7效果。
+    PRESSURE:
+      - §7若距离上次攻击不超过§60.5§7秒，则攻击时叠加
+      - §7一层§6超压§7。
+      - §7§6超压§7： 每层§6超压§7提供§610%暴击伤害§7，上限§65§7层。
+      - §7每秒减少§61§7层。
+    KILLER:
+      - §7致命伤害击杀敌人时获得 §6致命伤害+40%§7，
+      - §7持续§610§7秒。§610§7秒内无法重复获得效果。
+    MAINTAIN:
+      - §7击杀敌人时获得 §6每秒恢复+(最大生命值*2%）§7，持续§65秒§7。
+      - §7若为§6爆头伤害击杀§7则效果翻倍。
+    REVOLT:
+      - §7触发爆头伤害时获得 §6修复效能+30% §7，持续
+      - §7§615§7秒。§615§7秒内无法重复获得效果。
+    PERMANENCE:
+      - §7触发爆头伤害时获得 §6状态效果+50% §7，持续
+      - §7§65§7秒。§625§7秒内无法重复获得效果。
+    BLIND:
+      - §7对带有§6失明§7药水效果的敌人额外造成§620%§7
+      - §7伤害。
+      - §7击杀§64§7名敌人后，对下一次击中的敌人赋予
+      - §7§6失明§7效果。
+    PRICK:
+      - §7触发爆头伤害时获得 §6技能伤害+20% §7，持续
+      - §7§615§7秒。§615§7秒内无法重复获得效果。
+    STEADY:
+      - §7击中敌人时获得 §6命中+1§7 ，持续§610§7秒。
+    PUNCH:
+      - §7若本次攻击击杀敌人，且距离上次击杀§63§7秒以内，
+      - §7则获得 §6总伤害+40% §7，持续§610§7秒。§610§7秒内无法重
+      - §7复获得效果。
+    OUTSIDER:
+      - §7击杀一名敌人后获得 §6命中+100% §7，持续§610§7秒。
+      - §7§610§7秒内无法重复获得效果。
+    FIRST_BLOOD:
+      - §7若距离上一次攻击间隔了§615§7秒及以上，则本
+      - §7此攻击额外造成 §6（致命伤害）%§7伤害
+    FUTURE:
+      - §7武器击杀会获得 §6技能分阶+1§7 ，持续§615§7秒。
+      - §7§65§7秒内无法重复获得效果。
+      - §7若技能分阶为§66§7，则获得 §6技能伤害+30% §7，
+      - §7持续§615§7秒。§615§7秒内无法重复获得效果。
+    ASYSTOLE:
+      - §7对带有§6脉冲标记§7的敌人额外造成§620%§7伤害。
+      - §7击杀§63§7名敌人后，对下一次击中的敌人赋予
+      - §7§650§7层§6脉冲标记§7。
+      - ''
+      - §7§6脉冲标记§7:拥有此标记的对象获得 §6受到的
+      - §7§6的伤害+5% §7与 §6回避-10% §7。
+      - §7上限§6100§7层，每秒降低§61§7层。
+    SYNCHRO:
+      - §7击中敌人时获得 §6技能伤害+15% §7，持续§65§7秒。
+      - §7若§65§7秒内技能曾造成过伤害，则效果翻倍。
+      - §7技能造成伤害时获得 §6总伤害+15% §7，持续§65§7秒。
+      - §7若§65§7秒内武器曾造成过伤害，则效果翻倍。
+    PROTECT:
+      - §7生命值全满时获得 §6修复效能+100% §7。
+    HEMOPHAGIA:
+      - §7击杀敌人时获得 §6额外生命值+10% §7，持续§610§7秒。
+    ALERT:
+      - §7§6总伤害+25%§7 ，若受到攻击则会中断此增益§64秒§7。
+    UNSTOPPABLE:
+      - §7击杀敌人时获得 §6总伤害+5% §7，持续§615秒§7。
+      - §7最多可叠加 §65 §7次。
+    SHOCK:
+      - §7爆头会获得 §6总伤害+10%，持续§61.5秒§7。若使用
+      - §7狙击枪则持续§65秒§7。
+      - §7爆头击杀会获得 §6总伤害+15%，持续§610秒§7。
+    ADRENALINE:
+      - §7每§65秒§7进行一次扫描，只要周围5格内存在一名敌人，
+      - §7则获得 §6额外生命值+10% §7，持续§65秒§7。最多叠
+      - §7加3次。
+    UNBREAKABLE:
+      - §7当你的生命值耗尽时自动回复 §695%的最大生命值 §7。
+      - §7冷却时间：§660秒
+    GLASS_CANNON:
+      - §7可造成的所有伤害增加 §625%§7。
+      - §7自身受到伤害亦增加 §650%§7。
+    OBLITERATIVE:
+      - §7造成致命伤害时获得 §6总伤害+1% §7，持续§65秒§7。
+      - §7最多可叠加§625§7次。
+    HEAD_HUNTER:
+      - §7在爆头击杀敌人后，你在§630秒§7内的下一次武器攻击
+      - §7会额外获得一次本次伤害的§6125%§7加成。
+      - §7额外加成伤害最高为原始武器伤害的§6800%§7。若爆头
+      - §7伤害大于§6150%§7，则最高提升至§61250%§7。

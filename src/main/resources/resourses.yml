@@ -1,0 +1,140 @@
+list:
+  res_elec:
+  res_metal:
+  res_gearbox:
+  res_cloth:
+  res_china:
+  res_rf:
+  res_smg:
+  res_ar:
+  res_dmr:
+  res_sg:
+  res_mg:
+  res_hg:
+  brand_barrier:
+  brand_frontline:
+  brand_rick:
+  brand_quin:
+  brand_spank:
+  brand_dell:
+  brand_lasdimo:
+  brand_wild:
+  brand_hunter:
+  brand_t115:
+  brand_yell:
+  brand_mica:
+  brand_ligth:
+  brand_golan:
+  brand_agate:
+  brand_hall:
+  brand_miku:
+dismantle:
+  equipment:
+    types: [ "头盔","胸甲","枪套","护膝","背包","胸挂","普通装备" ]
+    res:
+      res_elec: 5
+      res_metal: 3
+      res_cloth: 10
+      res_china: 4
+  weapon:
+    types: [ "狙击枪","冲锋枪","突击步枪","精准射手步枪","霰弹枪","弩","机枪","手枪","近战武器" ]
+    res:
+      res_metal: 6
+      res_gearbox: 13
+  weapon-rf:
+    types: [ "狙击枪" ]
+    res:
+      res_rf: 1
+  weapon-smg:
+    types: [ "冲锋枪" ]
+    res:
+      res_smg: 1
+  weapon-ar:
+    types: [ "突击步枪" ]
+    res:
+      res_ar: 1
+  weapon-dmr:
+    types: [ "精准射手步枪" ]
+    res:
+      res_dmr: 1
+  weapon-sg:
+    types: [ "霰弹枪" ]
+    res:
+      res_sg: 1
+  weapon-mg:
+    types: [ "机枪" ]
+    res:
+      res_mg: 1
+  weapon-hg:
+    types: [ "手枪" ]
+    res:
+      res_hg: 1
+  brand_barrier:
+    types: [ "最终壁垒" ]
+    res:
+      brand_barrier: 1
+  brand_frontline:
+    types: [ "最终壁垒" ]
+    res:
+      brand_frontline: 1
+  brand_rick:
+    types: [ "瑞克希尔" ]
+    res:
+      brand_rick: 1
+  brand_quin:
+    types: [ "清川得里奇" ]
+    res:
+      brand_quin: 1
+  brand_spank:
+    types: [ "SPANK" ]
+    res:
+      brand_spank: 1
+  brand_dell:
+    types: [ "戴尔斯纳" ]
+    res:
+      brand_dell: 1
+  brand_lasdimo:
+    types: [ "拉斯提摩" ]
+    res:
+      brand_lasdimo: 1
+  brand_wild:
+    types: [ "荒野狩猎" ]
+    res:
+      brand_wild: 1
+  brand_hunter:
+    types: [ "猎人之眼" ]
+    res:
+      brand_hunter: 1
+  brand_t115:
+    types: [ "Tech115" ]
+    res:
+      brand_t115: 1
+  brand_yell:
+    types: [ "耶尔声纳" ]
+    res:
+      brand_yell: 1
+  brand_mica:
+    types: [ "韵穆阀门" ]
+    res:
+      brand_mica: 1
+  brand_light:
+    types: [ "东方光能" ]
+    res:
+      brand_light: 1
+  brand_golan:
+    types: [ "戈蓝瑞亚" ]
+    res:
+      brand_golan: 1
+  brand_agate:
+    types: [ "玛瑙哈瑙" ]
+    res:
+      brand_agate: 1
+  brand_hall:
+    types: [ "哈尔贝斯" ]
+    res:
+      brand_hall: 1
+  brand_miku:
+    types: [ "迷雾控制权" ]
+    res:
+      brand_miku: 1
+
