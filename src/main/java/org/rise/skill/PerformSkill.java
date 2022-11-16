@@ -16,8 +16,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.rise.EntityInf;
+import org.rise.State.Attr;
 import org.rise.State.AttrModifier;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.riseA;
 import org.rise.riseAPI;
 import org.rise.skill.Effect.*;
@@ -122,15 +123,17 @@ public class PerformSkill implements Runnable {
                         }
                     }
                 }
-                RAstate state = new RAstate();
+                RAState state = new RAState();
                 state.AllDefault();
                 state = state.applyModifier(entity);
                 if (entity != null) {
-                    if (entity instanceof Player) state = EntityInf.getPlayerState((Player) entity);
-                    else {
+                    if (entity instanceof Player) {
+                        state = EntityInf.getPlayerState((Player) entity);
                         state.init(entity);
-                        riseAPI.reAnalyseLores(state, entity.getHealth() / entity.getMaxHealth());
-                        state = state.applyModifier(entity);
+                        state = state.analyze(2, entity);
+                    } else {
+                        state.initAll(entity);
+                        state = state.analyze(1, entity).analyze(2, entity).applyModifier(entity);
                     }
                 }
                 switch (i.type) {
@@ -138,23 +141,27 @@ public class PerformSkill implements Runnable {
                         EffectPotion e = (EffectPotion) i;
                         int duration;
                         if (!e.aggressive) duration = (int) (e.duration * 20);
-                        else duration = (int) (e.duration * 20 * (1.0 - state.debuffResistance / 100));
+                        else duration = (int) (e.duration * 20 * (1.0 - state.getAttr(Attr.DEBUFF_RESISTANCE) / 100));
                         for (LivingEntity j : target) {
-                            RAstate def = new RAstate();
-                            if (j instanceof Player) def = EntityInf.getPlayerState(j.getUniqueId());
-                            else {
-                                def.AllDefault();
+                            RAState def = new RAState();
+                            if (j instanceof Player) {
+                                def = EntityInf.getPlayerState(j.getUniqueId());
                                 def.init(j);
+                            } else {
+                                def.AllDefault();
+                                def.initAll(j);
+                                def.analyze(1, j);
                             }
+                            def = def.analyze(2, j);
                             def = def.applyModifier(j);
 //                            tp.sendMessage(""+e.id.getId());
 //                            tp.sendMessage("dur:"+duration);
                             if (e.id.equals(PotionEffectType.GLOWING)) {
-                                duration = (int) (1.0 * duration * Math.max(0, (100 - def.pulseResistance) / 100.0));
+                                duration = (int) (1.0 * duration * Math.max(0, (100 - def.getAttr(Attr.PULSE_RESISTANCE)) / 100.0));
                                 if (j.getWorld().getName().startsWith("pvp")) duration /= 2;
                             }
 //                            tp.sendMessage("dur:"+duration);
-                            PotionEffect tmp = new PotionEffect(e.id, duration, e.level[(int) state.skillLevel]);
+                            PotionEffect tmp = new PotionEffect(e.id, duration, e.level[(int) state.getAttr(Attr.SKILL_LEVEL)]);
                             tmp.apply(j);
                         }
                         break;
@@ -163,23 +170,25 @@ public class PerformSkill implements Runnable {
                         EffectAttr e = (EffectAttr) i;
                         double duration;
                         if (!e.aggressive) duration = (e.duration);
-                        else duration = e.duration * (1.0 - state.debuffResistance / 100);
+                        else duration = e.duration * (1.0 - state.getAttr(Attr.DEBUFF_RESISTANCE) / 100);
                         double val = e.val;
                         for (LivingEntity j : target) {
-                            RAstate def = new RAstate();
+                            RAState def = new RAState();
                             def.AllDefault();
-                            if (j != null) {
-                                if (j instanceof Player) def = EntityInf.getPlayerState((Player) j);
-                                else {
-                                    def.init(j);
-                                    riseAPI.reAnalyseLores(def, j.getHealth() / j.getMaxHealth());
-                                }
+                            if (j instanceof Player) {
+                                def = EntityInf.getPlayerState(j.getUniqueId());
+                                def.init(j);
+                            } else {
+                                def.AllDefault();
+                                def.initAll(j);
+                                def.analyze(1, j);
                             }
+                            def = def.analyze(2, j);
                             def = def.applyModifier(j);
                             if (e.aggressive) {
-                                val *= 1.0 - def.debuffResistance / 100;
-                                val *= state.debuffEffect;
-                            } else val *= state.recoverEffect;
+                                val *= 1.0 - def.getAttr(Attr.DEBUFF_RESISTANCE) / 100;
+                                val *= 1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100;
+                            } else val *= 1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100;
                             if (j != null)
                                 riseAPI.addAttrMod(j, new AttrModifier(val, e.modType, e.id, (long) (duration * 1000L)));
                         }
@@ -189,7 +198,7 @@ public class PerformSkill implements Runnable {
                         EffectExHp e = (EffectExHp) i;
                         for (LivingEntity j : target) {
                             if (!(j instanceof Player)) continue;
-                            double val = e.val * state.recoverEffect;
+                            double val = e.val * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 10);
                             double duration = e.duration;
                             riseAPI.addExHp((Player) j, val, (long) duration * 1000L);
                         }
@@ -199,7 +208,7 @@ public class PerformSkill implements Runnable {
                         EffectRecover e = (EffectRecover) i;
                         for (LivingEntity j : target) {
                             if (j.isDead()) continue;
-                            double val = e.val * state.recoverEffect;
+                            double val = e.val * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 10);
                             if (!e.isPercent)
                                 j.setHealth(Math.min(j.getHealth() + val, j.getMaxHealth()));
                             else j.setHealth(Math.min(j.getHealth() + val * j.getMaxHealth(), j.getMaxHealth()));
@@ -209,7 +218,7 @@ public class PerformSkill implements Runnable {
                     case REVIVE: {
                         for (LivingEntity j : target) {
                             if (j instanceof Player) {
-                                RAstate s1 = EntityInf.getPlayerState((Player) j);
+                                RAState s1 = EntityInf.getPlayerState((Player) j);
                                 if (!s1.downed) continue;
                                 riseAPI.setPlayerRevived((Player) j, entity);
                             }
@@ -245,23 +254,23 @@ public class PerformSkill implements Runnable {
                         List<String> lore = new LinkedList<>();
                         double val = 1.0, vd = 0;
                         if (e.target.type != TargetBase.Type.SELF) {
-                            vd = e.state.damage * (1.0 + e.increase.damage * state.skillLevel / 100) * state.skillDamage;
+                            vd = e.state.getAttr(Attr.DAMAGE) * (1.0 + e.increase.getAttr(Attr.DAMAGE) * state.getAttr(Attr.SKILL_LEVEL) / 100) * (1.0 + state.getAttr(Attr.SKILL_DAMAGE) / 100);
 //                            tp.sendMessage("s:"+state.skillDamage+" "+vd);
-                        } else vd = e.state.damage;
+                        } else vd = e.state.getAttr(Attr.DAMAGE);
 //                        tp.sendMessage("sss:"+vd);
 
                         lore.add(riseA.damageS + vd);
-                        val = e.state.hit * (1.0 + e.increase.hit * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.HIT) * (1.0 + e.increase.getAttr(Attr.HIT) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.hitRateS + val);
-                        val = e.state.critChance * (1.0 + e.increase.critChance * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.CRIT) * (1.0 + e.increase.getAttr(Attr.CRIT) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.critChanceS + val);
-                        val = e.state.critRate * (1.0 + e.increase.critRate * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.CRIT_RATE) * (1.0 + e.increase.getAttr(Attr.CRIT_RATE) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.critRateS + val);
-                        val = e.state.physicalPiercing * (1.0 + e.increase.physicalPiercing * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.PHYSICAL_PIERCING) * (1.0 + e.increase.getAttr(Attr.PHYSICAL_PIERCING) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.physicalPiercingS + val);
-                        val = e.state.trueDamage * (1.0 + e.increase.trueDamage * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.TRUE_DAMAGE) * (1.0 + e.increase.getAttr(Attr.TRUE_DAMAGE) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.trueDamageS + val);
-                        val = e.state.percentDamage * (1.0 + e.increase.percentDamage * state.skillLevel / 100);
+                        val = e.state.getAttr(Attr.PERCENT_DAMAGE) * (1.0 + e.increase.getAttr(Attr.PERCENT_DAMAGE) * state.getAttr(Attr.SKILL_LEVEL) / 100);
                         lore.add(riseA.percentDamageS + val);
                         if (state.activeTalent.contains(TalentType.SYNCHRO)) {
                             lore.add(riseA.talentS);
@@ -284,12 +293,12 @@ public class PerformSkill implements Runnable {
                     case CUSTOMEFFECT: {
                         EffectCustomEffect e = (EffectCustomEffect) i;
                         for (LivingEntity j : target) {
-                            RAstate def = new RAstate();
+                            RAState def = new RAState();
                             def.AllDefault();
                             def.init(j);
                             def = def.applyModifier(j);
-                            double d = e.length * (1.0 - def.debuffResistance / 100.0);
-                            riseAPI.addEffect(state, j, e.effectType, state.debuffEffect * (1.0 + 0.3 * state.skillLevel), e.level, d);
+                            double d = e.length * (1.0 - def.getAttr(Attr.DEBUFF_RESISTANCE) / 100.0);
+                            riseAPI.addEffect(state, j, e.effectType, (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100) * (1.0 + 0.3 * state.getAttr(Attr.SKILL_LEVEL)), e.level, d);
                         }
                         break;
                     }

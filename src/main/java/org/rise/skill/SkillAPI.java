@@ -4,7 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,11 +20,11 @@ public class SkillAPI {
         if (skill == null) return false;
         if (!force) {
             if (entity instanceof Player) {
-                RAstate state = EntityInf.getPlayerState((Player) entity);
+                RAState state = EntityInf.getPlayerState((Player) entity);
                 if (EntityInf.cdProgress.containsKey(skill.cd_type)) {
                     Map<UUID, Long> t = EntityInf.cdProgress.get(skill.cd_type);
                     if (t.containsKey(entity.getUniqueId()) && t.get(entity.getUniqueId()) > 0) {
-                        entity.sendMessage("§f[§6ISAAC§f]§4技能冷却中!剩余时间: §f" + t.get(entity.getUniqueId()) / state.skillAccelerate / 1000 + "§4 秒！");
+                        entity.sendMessage("§f[§6ISAAC§f]§4技能冷却中!剩余时间: §f" + t.get(entity.getUniqueId()) / state.getAttr(Attr.SKILL_ACCELERATE) / 1000 + "§4 秒！");
                         return false;
                     }
                 }

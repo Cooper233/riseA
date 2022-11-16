@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.extra.Pair;
 import org.rise.refit.CalibrationData;
 import org.rise.refit.CalibrationItem;
@@ -64,13 +64,13 @@ public class EquipSelectGUI implements Listener {
         List<String> ht = new LinkedList<>();
         ht.add("§6[§f可注入槽位§6]");
         if (item.calibrated) {
-            Pair<AttrModifier.Attr, Double> pair = item.data.get(item.caliType).get(item.caliPos);
+            Pair<Attr, Double> pair = item.data.get(item.caliType).get(item.caliPos);
             String prefix = riseA.refitBaseMap.get(item.caliType).prefix;
             ht.add(prefix + ">§7" + riseA.attrName.get(pair.getKey()) + "  " + prefix + "§l" + pair.getValue());
         } else {
             for (String k : item.data.keySet()) {
-                List<Pair<AttrModifier.Attr, Double>> list1 = item.data.get(k);
-                for (Pair<AttrModifier.Attr, Double> pair : list1) {
+                List<Pair<Attr, Double>> list1 = item.data.get(k);
+                for (Pair<Attr, Double> pair : list1) {
                     String prefix = riseA.refitBaseMap.get(k).prefix;
                     String res = prefix + ">§7" + riseA.attrName.get(pair.getKey()) + "  " + prefix + "§l" + pair.getValue();
                     RefitSlotBase base = riseA.refitBaseMap.get(k).getSlot(type, pair.getKey());

@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ public class EntityDeathProcess implements Listener {
         UUID uuid = event.getEntity().getUniqueId();
         EntityInf.entityModifier.remove(uuid);
         if (Bukkit.getPlayer(uuid) != null) {
-            RAstate tmp = EntityInf.getPlayerState(uuid);
+            RAState tmp = EntityInf.getPlayerState(uuid);
             assert tmp != null;
             tmp.AllDefault();
             EntityInf.playersAttr.put(uuid, tmp);

@@ -10,7 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Enable.EnableEffectBase;
 import org.rise.skill.SkillAPI;
@@ -28,21 +29,21 @@ public abstract class PlatformBase extends ActiveBase {
     public double cd;
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         return null;
     }
 
     @Override
     public void skillAffect(Player player, boolean keyState) {
         if (!keyState) return;
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state = state.applyModifier(player);
         List<ActiveBase> list = ConstantEffect.getAffectingSkill(player);
         if (!list.contains(this) && !ConstantEffect.platformId.containsKey(player.getUniqueId())) {
             SkillBase skill = new SkillBase("部署支援平台", 0, "PLATFORM", 0, 1, 0, "PLATFORM", null, new EnableEffectBase("§f[§6ISAAC§f]已部署支援平台！", null, null, "modularwarfare:effect.platform_set"));
             boolean ifSec = SkillAPI.performSkill(player, skill, false);
             if (!ifSec) return;
-            double mod = 1.0 + state.skillLevel * levelModifier;
+            double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
             double hp = this.hp * mod;
             LivingEntity entity;
             entity = (LivingEntity) player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
@@ -81,8 +82,8 @@ public abstract class PlatformBase extends ActiveBase {
     public void ticklyCheck(Player player) {
         UUID i = player.getUniqueId();
         Entity e = Bukkit.getEntity(ConstantEffect.platformId.get(i));
-        RAstate state = EntityInf.getPlayerState(player);
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        RAState state = EntityInf.getPlayerState(player);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         long d = (long) (dur * mod * 1000);
         if (System.currentTimeMillis() - ConstantEffect.lastActive.get(player.getUniqueId()).get(this) > d) {
             ((Damageable) (e)).damage(100000000);
@@ -92,7 +93,7 @@ public abstract class PlatformBase extends ActiveBase {
             List<ActiveBase> a = ConstantEffect.getAffectingSkill(player);
             a.removeIf(j -> j.type.name().contains("PLATFORM"));
             ConstantEffect.constant.put(i, a);
-            double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
+            double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
             SkillBase skill = new SkillBase("支援平台-冷却", cd, "PLATFORM", 0, 1, 0, "PLATFORM", null, null);
             ;
             SkillAPI.performSkill(player, skill, true);

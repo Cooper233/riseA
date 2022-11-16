@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.refit.CalibrationData;
 import org.rise.refit.CalibrationItem;
 import org.rise.refit.RefitBase;
@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public class AttrSelectGUI implements Listener {
 
-    public static void addAttrComponent(Player player, String type, String slot, VexScrollingList list, AttrModifier.Attr attr) {
+    public static void addAttrComponent(Player player, String type, String slot, VexScrollingList list, Attr attr) {
         int num;
         if (list.getComponents() == null) num = 0;
         else num = list.getComponents().size();

@@ -10,7 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.material.MaterialData;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Effect.EffectRecover;
@@ -38,10 +39,10 @@ public class PlatformRecover extends PlatformBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double mod = 1.0 + state.skillLevel * 0.3;
-        double cd = this.cd * (1.0 - state.skillLevel * 0.05) / state.skillAccelerate;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * 0.3;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * 0.05) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
         double l = this.range * mod;
         double d = this.dur * mod;
         double re = this.recover * mod;
@@ -57,13 +58,13 @@ public class PlatformRecover extends PlatformBase {
 
     @Override
     public SkillBase disableSkill(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state = state.applyModifier(player);
         Map<ActiveBase, Long> tmp = ConstantEffect.lastActive.get(player.getUniqueId());
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         long lst = tmp.get(this);
         double val = 0.3 * Math.min((System.currentTimeMillis() - lst) / 1000, 15) / 15;
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
         double r = this.range * mod;
         player.sendMessage("§f[§6ISAAC§f]已手动关闭支援平台！");
         EnableEffectBase ee = new EnableEffectBase(null, null, null, "modularwarfare:effect.platform_disable");
@@ -81,13 +82,13 @@ public class PlatformRecover extends PlatformBase {
 
     @Override
     public void secondlyCheck(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state.applyModifier(player);
         Entity e = Bukkit.getEntity(ConstantEffect.platformId.get(player.getUniqueId()));
         Zombie z = (Zombie) e;
-        double mod = 1.0 + state.skillLevel * this.levelModifier;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * this.levelModifier;
         double l = this.range * mod;
-        double v = this.recover * mod * state.recoverEffect;
+        double v = this.recover * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         SkillBase skill = new SkillBase("支援平台-恢复-治疗", 0, "PLATFORM-R", 0, 1, 0, "PLATFORM-R", Arrays.asList(new EffectRecover(false, v, new TargetBase(TargetBase.Type.AROUND, l, 100, Arrays.asList(NpcType.NPC_ENEMY, NpcType.OTHER), Arrays.asList(NpcType.PLAYER)))), new EnableEffectBase(null, EnableEffectBase.ParticleType.PLATFORM, Arrays.asList("5"), "modularwarfare:effect.platform_constant"));
         SkillAPI.performSkill(z, skill, false);
         MaterialData data = new MaterialData(Material.STAINED_GLASS);

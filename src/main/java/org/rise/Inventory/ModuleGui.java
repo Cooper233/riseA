@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
 
@@ -46,7 +46,7 @@ public class ModuleGui implements Listener {
     }
 
     public static ItemStack getInfo(Player player) {
-        RAstate state = EntityInf.playersAttr.get(player.getUniqueId());
+        RAState state = EntityInf.playersAttr.get(player.getUniqueId());
 //        state=state.applyModifier(player);
         ItemStack info = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
         ItemMeta i = info.getItemMeta();

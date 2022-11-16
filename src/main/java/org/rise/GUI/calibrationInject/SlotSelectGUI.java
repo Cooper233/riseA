@@ -7,7 +7,7 @@ import lk.vexview.gui.VexGui;
 import lk.vexview.gui.components.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.extra.Pair;
 import org.rise.refit.CalibrationData;
 import org.rise.refit.CalibrationItem;
@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SlotSelectGUI implements Listener {
-    private static void addButton(VexGui gui, String type, String s, AttrModifier.Attr a, RefitBase base, AttrModifier.Attr now, double val, CalibrationItem item, int pos) {
+    private static void addButton(VexGui gui, String type, String s, Attr a, RefitBase base, Attr now, double val, CalibrationItem item, int pos) {
         String name = riseA.attrName.get(a);
         name += " " + base.prefix + String.format("%.2f", val);
         RefitSlotBase slot = riseA.refitBaseMap.get(s).getSlot(type, now);
@@ -53,7 +53,7 @@ public class SlotSelectGUI implements Listener {
                 VexScrollingList sl = new VexScrollingList(365, 25, 170, 200, Math.max(10 + 20 * base.refits.get(type).size(), 200));
                 int l = 0;
                 for (RefitSlotBase slot : base.refits.get(type)) {
-                    AttrModifier.Attr attr = slot.type;
+                    Attr attr = slot.type;
                     if (a != null && attr != a && item.getAttrNum(s, attr) != 0) {
                         continue;
                     }
@@ -146,11 +146,11 @@ public class SlotSelectGUI implements Listener {
             addButton(gui, type, item.caliType, item.caliAttr, riseA.refitBaseMap.get(item.caliType), item.caliAttr, item.getAttrNum(item.caliType, item.caliAttr), item, 1);
         } else {
             for (String s : item.data.keySet()) {
-                List<Pair<AttrModifier.Attr, Double>> list = item.data.get(s);
+                List<Pair<Attr, Double>> list = item.data.get(s);
                 RefitBase base = riseA.refitBaseMap.get(s);
-                for (Pair<AttrModifier.Attr, Double> i : list) {
+                for (Pair<Attr, Double> i : list) {
                     num += 1;
-                    AttrModifier.Attr a = i.getKey();
+                    Attr a = i.getKey();
                     addButton(gui, type, s, a, base, i.getKey(), i.getValue(), item, num);
                 }
             }

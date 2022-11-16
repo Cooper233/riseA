@@ -1,7 +1,7 @@
 package org.rise.activeSkills.effect;
 
 import org.bukkit.entity.Player;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public abstract class ActiveBase {
     public double cdModifier;
     public double levelModifier;
 
-    public abstract List<String> ApplyMod(RAstate state);
+    public abstract List<String> ApplyMod(RAState state);
 
     public ActiveBase() {
     }

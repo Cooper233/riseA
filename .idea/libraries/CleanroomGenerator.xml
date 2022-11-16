@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="CleanroomGenerator">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Mohist1.12/plugins/CleanroomGenerator.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

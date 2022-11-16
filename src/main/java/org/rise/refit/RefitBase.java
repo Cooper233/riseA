@@ -6,7 +6,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
 
@@ -36,7 +36,7 @@ public class RefitBase {
         }
     }
 
-    public RefitSlotBase getSlot(String type, AttrModifier.Attr attr) {
+    public RefitSlotBase getSlot(String type, Attr attr) {
         List<RefitSlotBase> list = refits.get(type);
         if (list == null) return null;
         for (RefitSlotBase i : list) {

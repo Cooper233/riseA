@@ -17,13 +17,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.rise.*;
 import org.rise.GUI.exhpGUI;
+import org.rise.State.Attr;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.activeSkills.effect.ActiveBase;
-import org.rise.activeSkills.effect.ShieldCovered;
-import org.rise.activeSkills.effect.ShieldCrusaders;
+import org.rise.activeSkills.effect.ShieldBase;
 import org.rise.skill.Effect.*;
 import org.rise.skill.Enable.EnableEffectBase;
 import org.rise.skill.SkillAPI;
@@ -34,6 +34,8 @@ import org.rise.team.TeamBase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
+import static org.rise.State.Attr.*;
 
 public class EntityAttackProcess implements Listener {
     private double pow(double x) {
@@ -56,7 +58,7 @@ public class EntityAttackProcess implements Listener {
         if (!(event.getEntity() instanceof LivingEntity)) return;
         LivingEntity def = (LivingEntity) event.getEntity();
         UUID uuid = def.getUniqueId();
-        RAstate defState = new RAstate();
+        RAState defState = new RAState();
         if (def instanceof Player) {
             defState = EntityInf.getPlayerState((Player) def);
             long time = System.currentTimeMillis();
@@ -67,10 +69,9 @@ public class EntityAttackProcess implements Listener {
                 return;
             }
         }
-        defState.setDefault();
-        defState.init(def);
-        riseAPI.reAnalyseLores(defState, def.getHealth() / def.getMaxHealth());
-        if (def instanceof Player) defState = EntityInf.getPlayerState(def.getUniqueId());
+        defState.AllDefault();
+        if (def instanceof Player) defState = EntityInf.getPlayerState(def.getUniqueId()).analyze(2, def);
+        else defState = EntityInf.getEntityState(def);
         LivingEntity att = null;
         Entity damager = event.getDamager();
         if (damager.getType().getName() != null && damager.getType().getName().startsWith("mw_Ammo")) {
@@ -104,16 +105,16 @@ public class EntityAttackProcess implements Listener {
                 return;
             }
         }
-        RAstate attState = new RAstate();
-        if (att instanceof Player) attState = EntityInf.getPlayerState((Player) att);
+        RAState attState = new RAState();
+        attState.AllDefault();
+        if (att instanceof Player) attState = EntityInf.getPlayerState((Player) att).analyze(2, att);
+        else attState = EntityInf.getEntityState(att);
 //        tp.sendMessage("2");
         if (attState.downed) {
             event.setCancelled(true);
             return;
         }
-        attState.setDefault();
-        attState.init(att);
-        riseAPI.reAnalyseLores(attState, att.getHealth() / att.getMaxHealth());
+
         attState = attState.applyModifier(att);
         defState = defState.applyModifier(def);
         if (att instanceof Player && ConstantEffect.usingShield.contains(att.getUniqueId())) {
@@ -161,30 +162,29 @@ public class EntityAttackProcess implements Listener {
         }
 //        tp.sendMessage("3");
         double damage = event.getDamage();
-        if (damage == 0) damage = attState.damage;
-        if (att instanceof Player) damage = attState.damage;
-        damage *= 1.0 + attState.finalDamage / 100.0;
+        if (att instanceof Player) damage = attState.getAttr(Attr.DAMAGE);
+        damage *= 1.0 + attState.getAttr(FINAL_DAMAGE) / 100.0;
         double hitMod = 1.0;
-        attState.hit = Math.max(1, attState.hit * hitMod);
+        attState.multiAttr(HIT, hitMod);
         if (att.getWorld() == def.getWorld()) {
             int light = world.getBlockAt(def.getLocation()).getLightLevel();
             double lightRate = 1.0 * (light + 1) / 16.0;
-            hitMod = 0.1 + 0.9 * (lightRate + (1 - lightRate) * attState.nfAbility / 100);
-            attState.hit = Math.max(1, attState.hit * hitMod);
+            hitMod = 0.1 + 0.9 * (lightRate + (1 - lightRate) * attState.getAttr(NF_ABILITY) / 100);
+            attState.multiAttr(HIT, hitMod);
             double dis = att.getLocation().distance(def.getLocation());
-            if (dis <= 3) attState.hit *= 1.5;
-            if (dis <= 2) attState.hit *= 2;
-            if (dis <= 1) attState.hit *= 2;
+            if (dis <= 3) attState.multiAttr(HIT, 1.5);
+            if (dis <= 2) attState.multiAttr(HIT, 2);
+            if (dis <= 1) attState.multiAttr(HIT, 2);
 
         }
 
         double chance2 = Math.random();
         boolean ifCrit = false, ifDodged = false, ifKilled = false, ifIndirect = false, ifHeadshot = false;
-        if (chance2 <= attState.critChance / 100) {//暴击判定
+        if (chance2 <= attState.getAttr(CRIT) / 100) {//暴击判定
             ifCrit = true;
-            damage = damage * ((100 + attState.critRate) / 100);
+            damage = damage * ((100 + attState.getAttr(CRIT_RATE)) / 100);
         }
-        double hitRate = attState.hit / (attState.hit + defState.avoid);
+        double hitRate = attState.getAttr(HIT) / (attState.getAttr(HIT) + defState.getAttr(AVOID));
         double chance1 = Math.random();
         if (chance1 > hitRate) {//命中判定
             ifDodged = true;
@@ -204,24 +204,24 @@ public class EntityAttackProcess implements Listener {
             if (!defState.nonHeadshot) {
                 if (Math.abs(Math.abs(y1 - loc2.getY()) - def.getEyeHeight()) / def.getEyeHeight() <= 0.15) {
                     ifHeadshot = true;
-                    damage *= 1.0 + attState.headshotRate / 100;
+                    damage *= 1.0 + attState.getAttr(HEADSHOT_RATE) / 100;
                 }
             }
         }
-        damage += Math.min(attState.percentDamage / 100 * def.getMaxHealth(), riseA.percentDamageMax);
+        damage += Math.min(attState.getAttr(PERCENT_DAMAGE) / 100 * def.getMaxHealth(), riseA.percentDamageMax);
         double bfDamage = damage;
         if (att instanceof Player && def instanceof Player) {
             bfDamage *= 2;
             damage *= 0.5;
         }
-        double ab = defState.physicalResistance - attState.physicalPiercing;
+        double ab = defState.getAttr(PHYSICAL_RESISTANCE) - attState.getAttr(PHYSICAL_PIERCING);
         if (ab > 0) damage -= ab;
         else damage += Math.min(ab, 2);
         damage = Math.max(damage, 1);
-        damage = damage * defState.damageReceive;
-        damage += Math.min(riseA.trueDamageMax, attState.trueDamage);
-        bfDamage += Math.min(riseA.trueDamageMax, attState.trueDamage);
-        damage *= (100 - defState.specialResistance) / 100;
+        damage = damage * (100 + defState.getAttr(DAMAGE_RECEIVE)) / 100;
+        damage += Math.min(riseA.trueDamageMax, attState.getAttr(TRUE_DAMAGE));
+        bfDamage += Math.min(riseA.trueDamageMax, attState.getAttr(TRUE_DAMAGE));
+        damage *= (100 - defState.getAttr(SPECIAL_RESISTANCE)) / 100;
         if (def instanceof Player) {
             damage = defState.resistDamage(damage);
             EntityInf.playersAttr.put(def.getUniqueId(), defState);
@@ -240,7 +240,7 @@ public class EntityAttackProcess implements Listener {
             switch (i) {
                 case KILLER: {
                     if (ifCrit && ifKilled) {
-                        SkillBase skill = new SkillBase("杀手", 0, 1, 10, "KILLER", Arrays.asList(new EffectAttr(AttrModifier.Attr.CRIT_RATE, 10, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("杀手", 0, 1, 10, "KILLER", Arrays.asList(new EffectAttr(Attr.CRIT_RATE, 10, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -249,7 +249,7 @@ public class EntityAttackProcess implements Listener {
                     if (ifKilled) {
                         double mod = 0.02;
                         if (ifHeadshot) mod *= 2;
-                        SkillBase skill = new SkillBase("维护保存", 0, 1, 0, "MAINTAIN", Arrays.asList(new EffectAttr(AttrModifier.Attr.HP_REGEN, 5, att.getMaxHealth() * mod, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("维护保存", 0, 1, 0, "MAINTAIN", Arrays.asList(new EffectAttr(Attr.HP_REGEN, 5, att.getMaxHealth() * mod, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -258,7 +258,7 @@ public class EntityAttackProcess implements Listener {
                     if (ifKilled) {
                         double mod = 0.04;
                         if (ifHeadshot) mod *= 2;
-                        SkillBase skill = new SkillBase("完美维护保存", 0, 1, 0, "MAINTAIN_PERFECT", Arrays.asList(new EffectAttr(AttrModifier.Attr.HP_REGEN, 5, att.getMaxHealth() * mod, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("完美维护保存", 0, 1, 0, "MAINTAIN_PERFECT", Arrays.asList(new EffectAttr(Attr.HP_REGEN, 5, att.getMaxHealth() * mod, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -273,7 +273,7 @@ public class EntityAttackProcess implements Listener {
                 case CLOSE_COMBAT: {
                     if (ifKilled && att.getWorld() == def.getWorld()) {
                         if (att.getLocation().distance(def.getLocation()) <= 5) {
-                            SkillBase skill = new SkillBase("短兵相接", 0, 1, 10, "CLOSE_COMBAT", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, 10, 30, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                            SkillBase skill = new SkillBase("短兵相接", 0, 1, 10, "CLOSE_COMBAT", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, 10, 30, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                             SkillAPI.performSkill(att, skill, false);
                         }
                     }
@@ -282,7 +282,7 @@ public class EntityAttackProcess implements Listener {
                 case SADISM: {
                     if (EntityInf.killCount.containsKey(att.getUniqueId()) && EntityInf.killCount.get(att.getUniqueId()) == 4) {
                         EntityInf.killCount.put(att.getUniqueId(), 0);
-                        SkillBase skill = new SkillBase("虐待狂", 0, 1, 0, "SADISM", Arrays.asList(new EffectPotion(PotionEffectType.SLOW, 5 * attState.debuffEffect, new int[]{1, 1, 1, 1, 1, 1, 1}, true, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("虐待狂", 0, 1, 0, "SADISM", Arrays.asList(new EffectPotion(PotionEffectType.SLOW, 5 * (1 + attState.getAttr(DEBUFF_EFFECT) / 100), new int[]{1, 1, 1, 1, 1, 1, 1}, true, TargetBase.SELF)));
                         SkillAPI.performSkill(def, skill, false);
                     }
                     if (def.hasPotionEffect(PotionEffectType.SLOW)) {
@@ -296,13 +296,13 @@ public class EntityAttackProcess implements Listener {
                             List<AttrModifier> l = EntityInf.entityModifier.get(def.getUniqueId());
                             boolean find = false;
                             for (AttrModifier j : l) {
-                                if (j.val < 0 || (j.tar == AttrModifier.Attr.DAMAGE_RECEIVE && j.val > 0)) {
+                                if (j.val < 0 || (j.tar == Attr.DAMAGE_RECEIVE && j.val > 0)) {
                                     find = true;
                                     break;
                                 }
                             }
                             if (find) {
-                                SkillBase skill = new SkillBase("报复之心", 0, 1, 20, "REVENGE", Arrays.asList(new EffectAttr(AttrModifier.Attr.CRIT_RATE, 20, 15, AttrModifier.ModType.PLUS, false, TargetBase.TEAM), new EffectAttr(AttrModifier.Attr.CRIT, 20, 15, AttrModifier.ModType.PLUS, false, TargetBase.TEAM)));
+                                SkillBase skill = new SkillBase("报复之心", 0, 1, 20, "REVENGE", Arrays.asList(new EffectAttr(Attr.CRIT_RATE, 20, 15, AttrModifier.ModType.PLUS, false, TargetBase.TEAM), new EffectAttr(Attr.CRIT, 20, 15, AttrModifier.ModType.PLUS, false, TargetBase.TEAM)));
                                 SkillAPI.performSkill(att, skill, false);
                             }
                         }
@@ -325,14 +325,14 @@ public class EntityAttackProcess implements Listener {
                 }
                 case STEADY: {
                     if (!ifDodged) {
-                        SkillBase skill = new SkillBase("双手沉稳", 0, 1, 0, "STEADY", Arrays.asList(new EffectAttr(AttrModifier.Attr.HIT, 10, 1, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("双手沉稳", 0, 1, 0, "STEADY", Arrays.asList(new EffectAttr(Attr.HIT, 10, 1, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
                 }
                 case PRICK: {
                     if (!ifDodged && ifHeadshot) {
-                        SkillBase skill = new SkillBase("刺击", 0, 1, 15, "PRICK", Arrays.asList(new EffectAttr(AttrModifier.Attr.SKILL_DAMAGE, 15, 0.2, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("刺击", 0, 1, 15, "PRICK", Arrays.asList(new EffectAttr(Attr.SKILL_DAMAGE, 15, 20, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -340,7 +340,7 @@ public class EntityAttackProcess implements Listener {
                 case BLIND: {
                     if (EntityInf.killCount.containsKey(att.getUniqueId()) && EntityInf.killCount.get(att.getUniqueId()) == 4) {
                         EntityInf.killCount.put(att.getUniqueId(), 0);
-                        SkillBase skill = new SkillBase("致盲", 0, 1, 0, "BLIND", Arrays.asList(new EffectPotion(PotionEffectType.BLINDNESS, 5 * attState.debuffEffect, new int[]{0, 0, 0, 0, 0, 0, 0}, true, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("致盲", 0, 1, 0, "BLIND", Arrays.asList(new EffectPotion(PotionEffectType.BLINDNESS, 5 * (1.0 + attState.getAttr(DEBUFF_EFFECT) / 100), new int[]{0, 0, 0, 0, 0, 0, 0}, true, TargetBase.SELF)));
                         SkillAPI.performSkill(def, skill, false);
                     }
                     if (def.hasPotionEffect(PotionEffectType.SLOW)) {
@@ -350,14 +350,14 @@ public class EntityAttackProcess implements Listener {
                 }
                 case PERMANENCE: {
                     if (!ifDodged && ifHeadshot) {
-                        SkillBase skill = new SkillBase("长存", 0, 1, 25, "PERMANENCE", Arrays.asList(new EffectAttr(AttrModifier.Attr.DEBUFF_EFFECT, 5, 0.5, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("长存", 0, 1, 25, "PERMANENCE", Arrays.asList(new EffectAttr(Attr.DEBUFF_EFFECT, 5, 50, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
                 }
                 case REVOLT: {
                     if (!ifDodged && ifHeadshot) {
-                        SkillBase skill = new SkillBase("改革", 0, 1, 25, "REVOLT", Arrays.asList(new EffectAttr(AttrModifier.Attr.RECOVER_EFFECT, 15, 0.3, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("改革", 0, 1, 25, "REVOLT", Arrays.asList(new EffectAttr(Attr.RECOVER_EFFECT, 15, 30, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -365,10 +365,10 @@ public class EntityAttackProcess implements Listener {
                 case FUTURE: {
                     if (ifKilled) {
                         SkillBase skill;
-                        if (attState.skillLevel < 6) {
-                            skill = new SkillBase("未来完成式", 0, 1, 5, "FUTURE", Arrays.asList(new EffectAttr(AttrModifier.Attr.SKILL_LEVEL, 15, 1, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        if (attState.getAttr(SKILL_LEVEL) < 6) {
+                            skill = new SkillBase("未来完成式", 0, 1, 5, "FUTURE", Arrays.asList(new EffectAttr(Attr.SKILL_LEVEL, 15, 1, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         } else {
-                            skill = new SkillBase("未来完成式-6", 0, 1, 15, "FUTURE-6", Arrays.asList(new EffectAttr(AttrModifier.Attr.SKILL_DAMAGE, 15, 0.3, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                            skill = new SkillBase("未来完成式-6", 0, 1, 15, "FUTURE-6", Arrays.asList(new EffectAttr(Attr.SKILL_DAMAGE, 15, 30, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         }
                         SkillAPI.performSkill(att, skill, false);
                     }
@@ -377,18 +377,18 @@ public class EntityAttackProcess implements Listener {
                 case SYNCHRO://默认只有玩家拥有这个天赋
                 {
                     if (!ifDodged) {
-                        double val = 0.15;
+                        double val = 15;
                         if (System.currentTimeMillis() - EntityInf.getLastSkillAttack(att) < 5000) val *= 2;
-                        SkillBase skill = new SkillBase("同步伤害-1", 0, 1, 5, "REVOLT-1", Arrays.asList(new EffectAttr(AttrModifier.Attr.SKILL_DAMAGE, 5, val, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("同步伤害-1", 0, 1, 5, "REVOLT-1", Arrays.asList(new EffectAttr(Attr.SKILL_DAMAGE, 5, val, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     if (ifIndirect && !ifDodged) {
                         LivingEntity e = EntityInf.getOriginAttacker(att.getUniqueId());
-                        RAstate s = EntityInf.getPlayerState(e.getUniqueId());
+                        RAState s = EntityInf.getPlayerState(e.getUniqueId());
                         if (s.activeTalent.contains(TalentType.SYNCHRO)) {
                             double val = 15;
                             if (System.currentTimeMillis() - EntityInf.getLastAttack(e) < 5000) val *= 2;
-                            SkillBase skill = new SkillBase("同步伤害-2", 0, 1, 5, "REVOLT-2", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, 5, val, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                            SkillBase skill = new SkillBase("同步伤害-2", 0, 1, 5, "REVOLT-2", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, 5, val, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                             SkillAPI.performSkill(e, skill, false);
                         }
                     }
@@ -407,20 +407,20 @@ public class EntityAttackProcess implements Listener {
                 }
                 case FIRST_BLOOD: {
                     if (System.currentTimeMillis() - EntityInf.getLastAttack(att) > 15000) {
-                        damage *= 1.0 + attState.critRate / 100;
+                        damage *= 1.0 + attState.getAttr(CRIT_RATE) / 100;
                     }
                     break;
                 }
                 case PUNCH: {
                     if (ifKilled && System.currentTimeMillis() - EntityInf.getLastKilled(att) < 3000) {
-                        SkillBase skill = new SkillBase("拳拳到肉", 0, 1, 10, "PUNCH", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, 10, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("拳拳到肉", 0, 1, 10, "PUNCH", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, 10, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
                 }
                 case OUTSIDER: {
                     if (ifKilled) {
-                        SkillBase skill = new SkillBase("局外人", 0, 1, 10, "OUTSIDER", Arrays.asList(new EffectAttr(AttrModifier.Attr.HIT, 10, 2, AttrModifier.ModType.MULTIPLY, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("局外人", 0, 1, 10, "OUTSIDER", Arrays.asList(new EffectAttr(Attr.HIT, 10, 2, AttrModifier.ModType.MULTIPLY, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -457,11 +457,11 @@ public class EntityAttackProcess implements Listener {
                         if (attState.type.containsKey("狙击枪")) {
                             d = 5;
                         }
-                        SkillBase skill = new SkillBase("震荡", 0, 1, d, "SHOCK", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, d, 10, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("震荡", 0, 1, d, "SHOCK", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, d, 10, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     if (ifHeadshot && ifKilled) {
-                        SkillBase skill = new SkillBase("震荡-1", 0, 1, 10, "SHOCK-1", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, 10, 15, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("震荡-1", 0, 1, 10, "SHOCK-1", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, 10, 15, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
@@ -476,9 +476,9 @@ public class EntityAttackProcess implements Listener {
                 case HEAD_HUNTER: {
                     if (EntityInf.getLastKilled(att) == EntityInf.getLastHeadshot(att) && EntityInf.getLastAttack(att) == EntityInf.getLastKilled(att) && System.currentTimeMillis() - EntityInf.getLastKilled(att) <= 30000) {
                         double val = EntityInf.getLastAttackAmount(att);
-                        double src = attState.damage;
+                        double src = attState.getAttr(DAMAGE);
                         double _max = src * 8;
-                        if (attState.headshotRate > 150) {
+                        if (attState.getAttr(HEADSHOT_RATE) > 150) {
                             _max = src * 12.5;
                         }
                         val = Math.min(_max, val * 1.25);
@@ -490,13 +490,13 @@ public class EntityAttackProcess implements Listener {
                     if (!ifDodged) {
                         double sec = Math.random();
                         if (sec > 0.15) break;
-                        SkillBase skill = new SkillBase("白獒之眼", 0, 1, 5, "WHITE_AOGOU", Arrays.asList(new EffectAttr(AttrModifier.Attr.FINAL_DAMAGE, 3, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("白獒之眼", 0, 1, 5, "WHITE_AOGOU", Arrays.asList(new EffectAttr(Attr.FINAL_DAMAGE, 3, 40, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(att, skill, false);
                     }
                     break;
                 }
                 case SILENT_KILLING: {
-                    if (defState.physicalResistance <= attState.physicalPiercing * 0.2) {
+                    if (defState.getAttr(PHYSICAL_RESISTANCE) <= attState.getAttr(PHYSICAL_PIERCING) * 0.2) {
                         damage *= 1.05;
                     }
                     break;
@@ -582,7 +582,7 @@ public class EntityAttackProcess implements Listener {
                     if (!ifDodged) {
                         double x = Math.random();
                         if (x <= 0.25) {
-                            SkillBase skill = new SkillBase("牧羊人", 0, 1, 10, "NOMAD", Arrays.asList(new EffectAttr(AttrModifier.Attr.HP_REGEN, 3, att.getMaxHealth() * 0.1 / 3, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                            SkillBase skill = new SkillBase("牧羊人", 0, 1, 10, "NOMAD", Arrays.asList(new EffectAttr(Attr.HP_REGEN, 3, att.getMaxHealth() * 0.1 / 3, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                             SkillAPI.performSkill(att, skill, false);
                         }
                     }
@@ -602,22 +602,16 @@ public class EntityAttackProcess implements Listener {
                     break;
                 }
             }
-            double mod = 1.0 + defState.skillLevel * 0.3;
+            double mod = 1.0 + defState.getAttr(SKILL_LEVEL) * 0.3;
             double max = 1;
             double cd = 0;
-            switch (now.type) {
-                case SHIELD_COVERED: {
-                    ShieldCovered tt = (ShieldCovered) now;
-                    max = tt.maxHealth * mod * (1.0 + 0.3 * defState.hp / 50);
-                    hp -= Math.max(0, bfDamage - tt.armor * mod);
-                    cd = tt.cd * (1.0 - defState.skillLevel * 0.05);
-                    break;
-                }
+            switch (Objects.requireNonNull(now).type) {
+                case SHIELD_COVERED:
                 case SHIELD_CRUSADERS: {
-                    ShieldCrusaders tt = (ShieldCrusaders) now;
-                    max = tt.maxHealth * mod * (1.0 + 0.3 * defState.hp / 50);
+                    ShieldBase tt = (ShieldBase) now;
+                    max = tt.maxHealth * mod * (1.0 + 0.3 * defState.getAttr(HP) / 50);
                     hp -= Math.max(0, bfDamage - tt.armor * mod);
-                    cd = tt.cd * (1.0 - defState.skillLevel * 0.05);
+                    cd = tt.cd * (1.0 - defState.getAttr(SKILL_LEVEL) * 0.05);
                     break;
                 }
             }
@@ -654,7 +648,7 @@ public class EntityAttackProcess implements Listener {
                         double d = 30, val = 0.2;
                         if (defState.activeTalent.contains(TalentType.COURAGE_FIX)) val = 0.3;
                         if (defState.activeTalent.contains(TalentType.COURAGE_REFINE)) d = 20;
-                        SkillBase skill = new SkillBase("鼓起勇气", 0, 1, 0, "COURAGE", Arrays.asList(new EffectAttr(AttrModifier.Attr.HP_REGEN, d, fd * val / d, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
+                        SkillBase skill = new SkillBase("鼓起勇气", 0, 1, 0, "COURAGE", Arrays.asList(new EffectAttr(Attr.HP_REGEN, d, fd * val / d, AttrModifier.ModType.PLUS, false, TargetBase.SELF)));
                         SkillAPI.performSkill(def, skill, false);
                     }
                     break;
@@ -741,8 +735,9 @@ public class EntityAttackProcess implements Listener {
             EntityInf.killEvent(att);
             EntityInf.entityStack.remove(def.getUniqueId());
             EntityInf.entityModifier.remove(def.getUniqueId());
-            att.setHealth(Math.min(att.getHealth() + att.getMaxHealth() * attState.onKillRegen / 100, att.getMaxHealth()));
-            if (attState.onKillRegen > 0) world.spawnParticle(Particles.getRecoverParticle(), att.getLocation(), 3);
+            att.setHealth(Math.min(att.getHealth() + att.getMaxHealth() * attState.getAttr(ON_KILL_REGEN) / 100, att.getMaxHealth()));
+            if (attState.getAttr(ON_KILL_REGEN) > 0)
+                world.spawnParticle(Particles.getRecoverParticle(), att.getLocation(), 3);
             if (def instanceof Player) {
                 riseAPI.resetPlayerAttr((Player) def, true);
             }
@@ -772,7 +767,7 @@ public class EntityAttackProcess implements Listener {
             List<Player> list = new LinkedList<>();
             for (Entity i : player.getNearbyEntities(1, 1, 1)) {
                 if (i instanceof Player && !i.isDead()) {
-                    RAstate state = EntityInf.getPlayerState(i.getUniqueId());
+                    RAState state = EntityInf.getPlayerState(i.getUniqueId());
                     if (state.downed) {
                         list.add((Player) i);
                     }

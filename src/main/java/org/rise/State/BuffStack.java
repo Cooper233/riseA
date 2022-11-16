@@ -26,7 +26,7 @@ public class BuffStack {
         this.type = type;
     }
 
-    public static int getMaxStack(StackType type, RAstate state)//若只需获取基础最大值，state直接new一个就行
+    public static int getMaxStack(StackType type, RAState state)//若只需获取基础最大值，state直接new一个就行
     {
         switch (type) {
             case STRIKER: {
@@ -68,7 +68,7 @@ public class BuffStack {
         }
     }
 
-    public static void stackCheck(Map<StackType, Integer> map, RAstate state) {
+    public static void stackCheck(Map<StackType, Integer> map, RAState state) {
         Player tp = Bukkit.getPlayer("Tech635");
         if (map == null || map.isEmpty()) return;
         List<BuffStack.StackType> list = new LinkedList<>(map.keySet());

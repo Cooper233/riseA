@@ -9,7 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.material.MaterialData;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Effect.EffectBase;
@@ -33,13 +34,13 @@ public class PlatformRevive extends PlatformRecover {
 
     @Override
     public void secondlyCheck(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state.applyModifier(player);
         Entity e = Bukkit.getEntity(ConstantEffect.platformId.get(player.getUniqueId()));
         Zombie z = (Zombie) e;
-        double mod = 1.0 + state.skillLevel * this.levelModifier;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * this.levelModifier;
         double l = this.range * mod;
-        double v = this.recover * mod * state.recoverEffect;
+        double v = this.recover * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         TargetBase target = new TargetBase(TargetBase.Type.AROUND, l, 100, Arrays.asList(NpcType.NPC_ENEMY, NpcType.OTHER), Arrays.asList(NpcType.PLAYER));
         List<EffectBase> eff = new LinkedList<>();
         eff.add(new EffectRecover(false, v, target));
