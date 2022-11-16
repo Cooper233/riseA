@@ -5,7 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.effect.CustomEffectBase;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class EntityInf {
     public static Map<UUID, Integer> reviveProgress = new HashMap<>();
     public static Map<String, Map<UUID, Long>> lastSkillAffect = new HashMap<>();
     public static Map<String, Map<UUID, Long>> cdProgress = new HashMap<>();
-    public static Map<UUID, RAstate> playersAttr = new HashMap<>();//玩家的属性表，UUID-RAstate
+    public static Map<UUID, RAState> playersAttr = new HashMap<>();//玩家的属性表，UUID-RAstate
     public static Map<UUID, List<AttrModifier>> entityModifier = new HashMap<>();//实体的属性修改
     public static Map<UUID, List<CustomEffectBase>> entityEffect = new HashMap<>();//实体的状态效果
     public static Map<UUID, Map<BuffStack.StackType, Integer>> entityStack = new HashMap<>();//实体的叠层
@@ -36,6 +36,7 @@ public class EntityInf {
     public static Map<UUID, Integer> killCount = new HashMap<>();//手中武器的击杀数（玩家切换武器时重置为0，怪物不重置）
     public static Map<UUID, Long> lastRevive = new HashMap<>();//上次倒地时间
     public static Map<UUID, Long> lastProtect = new HashMap<>();//上次重创保护时间
+    public static Map<UUID, RAState> entityAttr = new HashMap<>();
 
     public static void allInfReset() {
         cdProgress.clear();
@@ -56,21 +57,37 @@ public class EntityInf {
         lastRevive.clear();
     }
 
-    public static RAstate getPlayerState(UUID id) {
+    public static RAState getPlayerState(UUID id) {
         if (Bukkit.getPlayer(id) != null) return playersAttr.get(id);
         else return null;
     }
 
-    public static RAstate getPlayerState(Player player) {
+    public static RAState getPlayerState(Player player) {
         return playersAttr.get(player.getUniqueId());
     }
 
-    public static RAstate getPlayerState(String name) {
+    public static RAState getPlayerState(String name) {
         Player a = Bukkit.getPlayer(name);
         return getPlayerState(a.getUniqueId());
     }
 
-    public static void putPlayerState(Player player, RAstate state) {
+    public static RAState getEntityState(LivingEntity entity) {
+        if (entityAttr.containsKey(entity.getUniqueId()))
+            return entityAttr.get(entity.getUniqueId()).analyze(2, entity);
+        RAState state = new RAState();
+        state.AllDefault();
+        state.initAll(entity);
+        return state.analyze(1, entity).analyze(2, entity);
+    }
+
+    public static void resetEntityState(LivingEntity entity) {
+        RAState state = new RAState();
+        state.AllDefault();
+        state.initAll(entity);
+        entityAttr.put(entity.getUniqueId(), state.analyze(1, entity));
+    }
+
+    public static void putPlayerState(Player player, RAState state) {
         playersAttr.put(player.getUniqueId(), state);
     }
 

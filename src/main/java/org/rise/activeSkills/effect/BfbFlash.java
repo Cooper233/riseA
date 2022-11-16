@@ -1,7 +1,8 @@
 package org.rise.activeSkills.effect;
 
 import org.bukkit.potion.PotionEffectType;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.skill.Effect.EffectBase;
 import org.rise.skill.Effect.EffectPotion;
@@ -28,10 +29,10 @@ public class BfbFlash extends BfbBase {
     }
 
     @Override
-    public SkillBase getSkill(RAstate state) {
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double dur = this.duration * mod * state.debuffEffect;
+    public SkillBase getSkill(RAState state) {
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double dur = this.duration * mod * (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
         double r = this.range * mod;
         List<EffectBase> eff = new LinkedList<>();
         TargetBase target = new TargetBase(TargetBase.Type.AROUND, r, 100, Arrays.asList(NpcType.NPC_FRIEND, NpcType.PLAYER, NpcType.ELC_NPC));
@@ -42,11 +43,11 @@ public class BfbFlash extends BfbBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier) / state.skillAccelerate;
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double dur = this.duration * mod * state.debuffEffect;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double dur = this.duration * mod * (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
         double r = this.range * mod;
         list.add("§6应用加成后数值：");
         list.add("§7爆炸范围         §e§l" + String.format("%.2f", r));

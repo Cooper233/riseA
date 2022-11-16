@@ -1,7 +1,7 @@
 package org.rise.activeSkills.effect;
 
 import org.bukkit.entity.Player;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public abstract class PulseBase extends ActiveBase {
     public double dur;
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         return null;
     }
 

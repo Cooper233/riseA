@@ -18,7 +18,7 @@ import org.rise.GUI.exhpGUI;
 import org.rise.Inventory.ModuleGui;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.effect.CustomEffectBase;
 import org.rise.riseA;
 import org.rise.riseAPI;
@@ -31,29 +31,30 @@ import org.rise.talent.TalentType;
 
 import java.util.*;
 
+import static org.rise.State.Attr.*;
 public class EntityUpdate {
     public static void setPlayerState(Player player) {
         Player tp = Bukkit.getPlayer("Tech635");
 
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state = state.applyModifier(player);
         if (state.downed) {
-            state.hp = state.hp * 2 + 20;
-            state.hpRegen = Math.min(20, (state.hp * 2 + 40) / 40);
-            state.speed = -90;
+            state.setAttr(HP, state.getAttr(HP) * 2 + 20);
+            state.setAttr(HP_REGEN, Math.min(20, (state.getAttr(HP) * 2 + 40) / 40));
+            state.setAttr(SPEED, -90);
             player.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, player.getEyeLocation(), 5, 0, 0, 0, 1);
             player.getWorld().spawnParticle(Particle.REDSTONE, player.getEyeLocation(), 5, 1, 1, 1, 2);
         }
-        if (state.hp != 0) {
-            double res = state.hp + 20;
-            if (state.percentHp != 0) res = res * (100 + state.percentHp) / 100.0;
+        if (state.getAttr(HP) != 0) {
+            double res = state.getAttr(HP) + 20;
+            if (state.getAttr(PERCENT_HP) != 0) res = res * (100 + state.getAttr(PERCENT_HP)) / 100.0;
             AttributeInstance instance = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
             instance.setBaseValue(Math.max(res, 20));
         } else {
             AttributeInstance instance = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
             instance.setBaseValue(20);
         }
-        player.setWalkSpeed((float) (0.2 * (100.0 + state.speed) / 100.0));
+        player.setWalkSpeed((float) (0.2 * (100.0 + state.getAttr(SPEED)) / 100.0));
         try {
             for (PotionEffectType i : state.potions.keySet()) {
                 PotionEffect p = new PotionEffect(i, 100, state.potions.get(i) - 1);
@@ -103,10 +104,10 @@ public class EntityUpdate {
             for (String i : EntityInf.cdProgress.keySet()) {
                 Map<UUID, Long> cds = EntityInf.cdProgress.get(i);
                 for (UUID uuid : cds.keySet()) {
-                    RAstate state = EntityInf.getPlayerState(uuid);
+                    RAState state = EntityInf.getPlayerState(uuid);
                     long left = cds.get(uuid);
                     if (state == null) continue;
-                    left -= 50 * state.skillAccelerate;
+                    left -= 50 * (1.0 + state.getAttr(SKILL_ACCELERATE) / 100);
                     cds.put(uuid, Math.max(0, left));
                 }
                 EntityInf.cdProgress.put(i, cds);
@@ -124,7 +125,7 @@ public class EntityUpdate {
             Collection<? extends Player> data = Bukkit.getServer().getOnlinePlayers();
             for (Player tmp : data) {
                 UUID uuid = tmp.getUniqueId();
-                RAstate state = EntityInf.getPlayerState(tmp);
+                RAState state = EntityInf.getPlayerState(tmp);
                 exhpGUI.barCheck(tmp);
                 ModuleGui.guiList.get(uuid).setItem(8, ModuleGui.getInfo(tmp));
                 BuffStack.stackEffect(state.buffStack, tmp);
@@ -138,7 +139,7 @@ public class EntityUpdate {
             for (Player tmp : data) {
                 UUID uuid = tmp.getUniqueId();
                 riseAPI.resetPlayerAttr(tmp);
-                RAstate state = EntityInf.getPlayerState(tmp);
+                RAState state = EntityInf.getPlayerState(tmp);
                 bagCheck(tmp);
                 state = state.applyModifier(Bukkit.getPlayer(uuid));
                 state.secondlyCheck();
@@ -166,8 +167,8 @@ public class EntityUpdate {
                     }
                 }
                 if (!tmp.isDead()) {
-                    if (state.downed) state.hpRegen = -Math.min(20, (state.hp * 2 + 40) / 40);
-                    tmp.setHealth(Math.min(Math.max(0.0, tmp.getHealth() + state.hpRegen), tmp.getMaxHealth()));
+                    if (state.downed) state.setAttr(HP_REGEN, -Math.min(20, (state.getAttr(HP) * 2 + 40) / 40));
+                    tmp.setHealth(Math.min(Math.max(0.0, tmp.getHealth() + state.getAttr(HP_REGEN)), tmp.getMaxHealth()));
                 }
                 setPlayerState(tmp);
             }
@@ -195,7 +196,7 @@ public class EntityUpdate {
             for (UUID uuid : EntityInf.entityStack.keySet()) {
                 Map<BuffStack.StackType, Integer> tmp = EntityInf.entityStack.get(uuid);
                 if (tmp == null) continue;
-                RAstate state = new RAstate();
+                RAState state = new RAState();
                 state.AllDefault();
                 state.lastBuffReduce = EntityInf.entityLastStackReduce.get(uuid);
                 if (state.lastBuffReduce == null) state.lastBuffReduce = new HashMap<>();

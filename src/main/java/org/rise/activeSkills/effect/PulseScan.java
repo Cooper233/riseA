@@ -3,9 +3,10 @@ package org.rise.activeSkills.effect;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.rise.EntityInf;
+import org.rise.State.Attr;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.skill.Effect.EffectAttr;
 import org.rise.skill.Effect.EffectBase;
@@ -40,14 +41,14 @@ public class PulseScan extends PulseBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double mod = 1.0 + state.skillLevel * 0.3;
-        double cd = this.cd * (1.0 - state.skillLevel * 0.05) / state.skillAccelerate;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * 0.3;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * 0.05) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
         double l = this.range * mod;
         double d = this.dur * mod;
-        double da = this.dec_avoid * mod * state.debuffEffect;
-        double ic = this.inc_damage * mod * state.debuffEffect / 100;
+        double da = this.dec_avoid * mod * (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
+        double ic = this.inc_damage * mod * (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
         int st = (int) (this.stack * mod);
         list.add("§6应用加成后数值：");
         list.add("§7扫描范围         §e§l" + String.format("%.2f", l));
@@ -61,20 +62,20 @@ public class PulseScan extends PulseBase {
 
     @Override
     public void beginningEffect(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double cd = this.cd * (1.0 - state.skillLevel * this.cdModifier);
+        RAState state = EntityInf.getPlayerState(player);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * this.cdModifier);
         double l = this.range * mod;
         double d = this.dur * mod;
         double da = Math.max(0, (100 - this.dec_avoid * mod) / 100);
         double ic = this.inc_damage * mod;
         int st = (int) (this.stack * mod);
-        da *= state.debuffEffect;
-        ic *= state.debuffEffect;
+        da *= (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
+        ic *= (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100);
         List<EffectBase> eff = new LinkedList<>();
         TargetBase target = new TargetBase(TargetBase.Type.AROUND, l, 100, Arrays.asList(NpcType.PLAYER, NpcType.NPC_FRIEND));
-        eff.add(new EffectAttr(AttrModifier.Attr.AVOID, d, da, AttrModifier.ModType.MULTIPLY, true, target));
-        eff.add(new EffectAttr(AttrModifier.Attr.DAMAGE_RECEIVE, d, ic / 100, AttrModifier.ModType.PLUS, true, target));
+        eff.add(new EffectAttr(Attr.AVOID, d, da, AttrModifier.ModType.MULTIPLY, true, target));
+        eff.add(new EffectAttr(Attr.DAMAGE_RECEIVE, d, ic / 100, AttrModifier.ModType.PLUS, true, target));
         eff.add(new EffectPotion(PotionEffectType.getById(24), d, new int[]{0, 0, 0, 0, 0, 0, 0}, true, target));
         eff.add(new EffectStack(BuffStack.StackType.PULSE_AFFECT, st, target));
         EnableEffectBase ee = new EnableEffectBase("§f[§6ISAAC§f]已启用脉冲扫描！", EnableEffectBase.ParticleType.PULSE, Arrays.asList("1", "0"), "modularwarfare:effect.pulse_scan");

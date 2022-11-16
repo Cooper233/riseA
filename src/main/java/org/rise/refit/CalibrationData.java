@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.extra.Pair;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class CalibrationData {
-    public static Map<UUID, Map<String, Map<String, Map<AttrModifier.Attr, Double>>>> playerAttrData = new HashMap<>();//玩家-改装类型-改装槽位-属性-数值
+    public static Map<UUID, Map<String, Map<String, Map<Attr, Double>>>> playerAttrData = new HashMap<>();//玩家-改装类型-改装槽位-属性-数值
     public static Map<UUID, Map<String, List<TalentType>>> playerTalentData = new HashMap<>();//玩家-改装类型-记录的天赋
 
     public static class calibraConsume {
@@ -32,10 +32,10 @@ public class CalibrationData {
     ;
     public static Map<String, List<List<calibraConsume>>> consume = new HashMap<>();
 
-    public static void performCalibration(Player player, CalibrationItem item, String slot, AttrModifier.Attr now, AttrModifier.Attr attr) {
+    public static void performCalibration(Player player, CalibrationItem item, String slot, Attr now, Attr attr) {
         PlayerInventory inv = player.getInventory();
         inv.removeItem(item.self);
-        List<Pair<AttrModifier.Attr, Double>> data = item.data.get(slot);
+        List<Pair<Attr, Double>> data = item.data.get(slot);
         List<Integer> pos = item.dataPos.get(slot);
         int fp = 0;
         for (int i = 0; i < data.size(); i++) {
@@ -66,8 +66,8 @@ public class CalibrationData {
         inv.addItem(item.self);
     }
 
-    public static Map<String, Map<String, Map<AttrModifier.Attr, Double>>> getTypesData(UUID uuid) {
-        Map<String, Map<String, Map<AttrModifier.Attr, Double>>> res = new HashMap<>();
+    public static Map<String, Map<String, Map<Attr, Double>>> getTypesData(UUID uuid) {
+        Map<String, Map<String, Map<Attr, Double>>> res = new HashMap<>();
         if (playerAttrData.containsKey(uuid)) {
 //            Bukkit.getLogger().info("1");
             res = playerAttrData.get(uuid);
@@ -75,9 +75,9 @@ public class CalibrationData {
         return res;
     }
 
-    public static Map<String, Map<AttrModifier.Attr, Double>> getSlotsData(UUID uuid, String type) {
-        Map<String, Map<AttrModifier.Attr, Double>> res = new HashMap<>();
-        Map<String, Map<String, Map<AttrModifier.Attr, Double>>> tmp = getTypesData(uuid);
+    public static Map<String, Map<Attr, Double>> getSlotsData(UUID uuid, String type) {
+        Map<String, Map<Attr, Double>> res = new HashMap<>();
+        Map<String, Map<String, Map<Attr, Double>>> tmp = getTypesData(uuid);
         if (tmp.containsKey(type)) {
 //            Bukkit.getLogger().info("2");
             res = tmp.get(type);
@@ -85,9 +85,9 @@ public class CalibrationData {
         return res;
     }
 
-    public static Map<AttrModifier.Attr, Double> getAttrData(UUID uuid, String type, String slot) {
-        Map<AttrModifier.Attr, Double> res = new HashMap<>();
-        Map<String, Map<AttrModifier.Attr, Double>> tmp1 = getSlotsData(uuid, type);
+    public static Map<Attr, Double> getAttrData(UUID uuid, String type, String slot) {
+        Map<Attr, Double> res = new HashMap<>();
+        Map<String, Map<Attr, Double>> tmp1 = getSlotsData(uuid, type);
         if (tmp1.containsKey(slot)) {
 //            Bukkit.getLogger().info("3");
             res = tmp1.get(slot);
@@ -95,8 +95,8 @@ public class CalibrationData {
         return res;
     }
 
-    public static double getData(UUID uuid, String type, String slot, AttrModifier.Attr attr) {
-        Map<AttrModifier.Attr, Double> attrData = getAttrData(uuid, type, slot);
+    public static double getData(UUID uuid, String type, String slot, Attr attr) {
+        Map<Attr, Double> attrData = getAttrData(uuid, type, slot);
         if (attrData.containsKey(attr)) {
 //            Bukkit.getLogger().info("4");
             return attrData.get(attr);
@@ -108,10 +108,10 @@ public class CalibrationData {
         return consume.get(type).get(lev);
     }
 
-    public static void saveAttrData(UUID uuid, String type, String slot, AttrModifier.Attr tar, double newData) {
-        Map<String, Map<String, Map<AttrModifier.Attr, Double>>> data = getTypesData(uuid);
-        Map<String, Map<AttrModifier.Attr, Double>> slotsData = getSlotsData(uuid, type);
-        Map<AttrModifier.Attr, Double> slotData = getAttrData(uuid, type, slot);
+    public static void saveAttrData(UUID uuid, String type, String slot, Attr tar, double newData) {
+        Map<String, Map<String, Map<Attr, Double>>> data = getTypesData(uuid);
+        Map<String, Map<Attr, Double>> slotsData = getSlotsData(uuid, type);
+        Map<Attr, Double> slotData = getAttrData(uuid, type, slot);
         slotData.put(tar, newData);
         slotsData.put(slot, slotData);
         data.put(type, slotsData);

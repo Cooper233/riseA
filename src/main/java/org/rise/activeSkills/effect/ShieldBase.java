@@ -6,7 +6,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Enable.EnableEffectBase;
 import org.rise.skill.SkillAPI;
@@ -23,12 +24,12 @@ public abstract class ShieldBase extends ActiveBase {
     public String shieldName;
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double mod = 1.0 + state.skillLevel * 0.3;
-        double cd = this.cd * (1.0 - state.skillLevel * 0.05) / state.skillAccelerate;
-        double max = this.maxHealth * mod * (1.0 + 0.3 * state.hp / 50);
-        double rc = this.recoverSpeed * mod * state.recoverEffect;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * 0.3;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * 0.05) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
+        double max = this.maxHealth * mod * (1.0 + 0.3 * state.getAttr(Attr.HP) / 50);
+        double rc = this.recoverSpeed * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         double ar = this.armor * mod;
         list.add("§6应用加成后数值：");
         list.add("§7护盾耐久         §e§l" + String.format("%.2f", max));
@@ -41,7 +42,7 @@ public abstract class ShieldBase extends ActiveBase {
     @Override
     public void skillAffect(Player player, boolean keyState) {
         if (!keyState) return;
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state.applyModifier(player);
         List<ActiveBase> list = ConstantEffect.getAffectingSkill(player);
         if (!ConstantEffect.usingShield.contains(player.getUniqueId())) {
@@ -52,9 +53,9 @@ public abstract class ShieldBase extends ActiveBase {
             list.add(this);
             ConstantEffect.constant.put(i, list);
             ConstantEffect.usingShield.add(i);
-            double mod = 1.0 + state.skillLevel * levelModifier;
+            double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
             double hp;
-            double max = this.maxHealth * (mod + levelModifier * state.hp / 50);
+            double max = this.maxHealth * (mod + levelModifier * state.getAttr(Attr.HP) / 50);
             hp = ConstantEffect.ShieldHealth.getOrDefault(i, max);
             ConstantEffect.ShieldHealth.put(i, hp);
             BossBar bar;
@@ -85,15 +86,15 @@ public abstract class ShieldBase extends ActiveBase {
     @Override
     public void secondlyCheck(Player player) {
         UUID i = player.getUniqueId();
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         state.applyModifier(player);
         BossBar bar = ConstantEffect.shieldGUI.get(i);
         List<ActiveBase> list = ConstantEffect.getAffectingSkill(player);
         if (!ConstantEffect.ShieldHealth.containsKey(i)) return;
         double hp = ConstantEffect.ShieldHealth.get(i);
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double max = this.maxHealth * (mod + 0.3 * state.hp / 50);
-        double rc = this.recoverSpeed * mod * state.recoverEffect;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double max = this.maxHealth * (mod + 0.3 * state.getAttr(Attr.HP) / 50);
+        double rc = this.recoverSpeed * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         if (ConstantEffect.usingShield.contains(i)) {
             if (System.currentTimeMillis() - ConstantEffect.lastShieldDamaged.get(i) > 3000) {
                 hp += rc;

@@ -7,7 +7,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Enable.EnableEffectBase;
 import org.rise.skill.SkillAPI;
@@ -42,11 +43,11 @@ public abstract class BfbBase extends ActiveBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         return null;
     }
 
-    public abstract SkillBase getSkill(RAstate state);
+    public abstract SkillBase getSkill(RAState state);
 
     public Location getTargetLoc(Player player) {
 //        for(Entity entity:player.getNearbyEntities(maxFlyingRange,maxFlyingRange,maxFlyingRange)){
@@ -62,7 +63,7 @@ public abstract class BfbBase extends ActiveBase {
 
     @Override
     public void skillAffect(Player player, boolean keyState) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         if (keyState) {
             if (ConstantEffect.isActiveTypeAffecting(player, type)) return;
             SkillBase skill = new SkillBase("使用粘弹", 0, "BFB", 0, 1, 0, "BFB", null, new EnableEffectBase("§f[§6ISAAC§f]已准备粘弹发射器，瞄准目标后松开按键以发射！", null, null, "modularwarfare:effect.bfb_prepare"));
@@ -74,7 +75,7 @@ public abstract class BfbBase extends ActiveBase {
             ConstantEffect.constant.put(i, a);
         } else {
             if (!ConstantEffect.isActiveTypeAffecting(player, type)) return;
-            double mod = 1.0 + state.skillLevel * levelModifier;
+            double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
             double r = this.range * mod;
             Location loc = getTargetLoc(player);
             if (loc != null) {
@@ -100,8 +101,8 @@ public abstract class BfbBase extends ActiveBase {
 
     @Override
     public void ticklyCheck(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        RAState state = EntityInf.getPlayerState(player);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         double r = this.range * mod;
         player.playSound(player.getEyeLocation(), "modularwarfare:effect.bfb_aiming", 16, 1);
         Location loc = getTargetLoc(player);

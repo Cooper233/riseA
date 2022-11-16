@@ -1,6 +1,7 @@
 package org.rise.activeSkills.effect;
 
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.skill.Effect.EffectBase;
 import org.rise.skill.Effect.EffectRecover;
@@ -29,12 +30,12 @@ public class BfbRecover extends BfbBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier) / state.skillAccelerate;
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
         double l = this.range * mod;
-        double re = this.recover * mod * state.recoverEffect;
+        double re = this.recover * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         list.add("§6应用加成后数值：");
         list.add("§7治疗范围         §e§l" + String.format("%.2f", l));
         list.add("§7恢复量          §e§l" + String.format("%.2f", re));
@@ -43,10 +44,10 @@ public class BfbRecover extends BfbBase {
     }
 
     @Override
-    public SkillBase getSkill(RAstate state) {
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
-        double mod = 1.0 + state.skillLevel * levelModifier;
-        double hp = this.recover * mod * state.recoverEffect;
+    public SkillBase getSkill(RAState state) {
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
+        double hp = this.recover * mod * (1.0 + state.getAttr(Attr.RECOVER_EFFECT) / 100);
         double r = this.range * mod;
         List<EffectBase> eff = new LinkedList<>();
         TargetBase target = new TargetBase(TargetBase.Type.AROUND, r, 100, Arrays.asList(NpcType.NPC_ENEMY, NpcType.OTHER, NpcType.PLAYER_ENEMY));

@@ -6,7 +6,8 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveType;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.effect.CustomEffect;
@@ -36,12 +37,12 @@ public class PulseEMP extends PulseBase {
     }
 
     @Override
-    public List<String> ApplyMod(RAstate state) {
+    public List<String> ApplyMod(RAState state) {
         List<String> list = new LinkedList<>();
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier) / state.skillAccelerate;
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         double d = this.dur * mod;
-        double de = this.damage_elc * mod * state.skillDamage;
+        double de = this.damage_elc * mod * (1.0 + state.getAttr(Attr.SKILL_DAMAGE) / 100);
         double r = this.range * mod;
         list.add("§6应用加成后数值：");
         list.add("§7最大脉冲范围     §e§l" + String.format("%.2f", r));
@@ -75,15 +76,15 @@ public class PulseEMP extends PulseBase {
     }
 
     public void empBlast(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         player.stopSound("modularwarfare:effect.pulse_emp_prepare");
         Map<ActiveBase, Long> tmp = ConstantEffect.lastActive.get(player.getUniqueId());
         double pt = System.currentTimeMillis() - tmp.get(this);
         double pg = pt / 4000 * 0.8 + 0.2;
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         double d = this.dur * mod;
-        double de = this.damage_elc * mod * state.skillDamage;
+        double de = this.damage_elc * mod * (1.0 + state.getAttr(Attr.SKILL_DAMAGE) / 100);
         double r = this.range * mod * pg;
         List<EffectBase> eff = new LinkedList<>();
         TargetBase t1 = new TargetBase(TargetBase.Type.AROUND, r, 100, Arrays.asList(NpcType.PLAYER, NpcType.NPC_FRIEND));
@@ -114,13 +115,13 @@ public class PulseEMP extends PulseBase {
 
     @Override
     public void ticklyCheck(Player player) {
-        RAstate state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player);
         Map<ActiveBase, Long> tt = ConstantEffect.lastActive.get(player.getUniqueId());
         double pt = System.currentTimeMillis() - tt.get(this);
         double pg = pt / 4000 * 0.8 + 0.2;
         pg = Math.min(1.0, pg);
-        double cd = this.cd * (1.0 - state.skillLevel * cdModifier);
-        double mod = 1.0 + state.skillLevel * levelModifier;
+        double cd = this.cd * (1.0 - state.getAttr(Attr.SKILL_LEVEL) * cdModifier);
+        double mod = 1.0 + state.getAttr(Attr.SKILL_LEVEL) * levelModifier;
         double r = this.range * mod * pg;
         MaterialData data = new MaterialData(Material.STAINED_GLASS);
         Location loc = player.getLocation();
@@ -137,7 +138,7 @@ public class PulseEMP extends PulseBase {
             player.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc, 100, r, 1, r, 0.2, data);
             player.stopSound("modularwarfare:effect.pulse_emp_prepare");
             double d = this.dur * mod;
-            double de = this.damage_elc * mod * state.skillDamage;
+            double de = this.damage_elc * mod * (1.0 + state.getAttr(Attr.SKILL_DAMAGE) / 100);
             List<EffectBase> eff = new LinkedList<>();
             TargetBase t1 = new TargetBase(TargetBase.Type.AROUND, r, 100, Arrays.asList(NpcType.PLAYER, NpcType.NPC_FRIEND));
             TargetBase t2 = new TargetBase(TargetBase.Type.AROUND, r, 100, Arrays.asList(NpcType.PLAYER, NpcType.NPC_FRIEND), Arrays.asList(NpcType.ELC_NPC));

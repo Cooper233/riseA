@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.riseAPI;
 
@@ -25,7 +25,7 @@ public class PlayerReviving implements Listener {
         Player res = null;
         for (Entity i : list) {
             if (i instanceof Player) {
-                RAstate state = EntityInf.getPlayerState((Player) i);
+                RAState state = EntityInf.getPlayerState((Player) i);
                 if (!state.downed) continue;
                 if (EntityInf.revivingMapReflect.containsKey(i.getUniqueId())) continue;
                 res = (Player) i;
@@ -64,7 +64,7 @@ public class PlayerReviving implements Listener {
     @EventHandler
     public void preventJump(PlayerMoveEvent event) {
         Player res = (Player) event.getPlayer();
-        RAstate state = EntityInf.getPlayerState(res);
+        RAState state = EntityInf.getPlayerState(res);
         if (state == null || !state.downed) return;
         Location tmp = event.getTo();
         if (tmp.getY() > event.getFrom().getY()) {

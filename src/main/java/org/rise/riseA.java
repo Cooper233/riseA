@@ -29,8 +29,9 @@ import org.rise.Inventory.ModuleGui;
 import org.rise.Inventory.ModuleL2;
 import org.rise.Inventory.ModuleL3;
 import org.rise.Listener.*;
-import org.rise.State.AttrModifier;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.ExtraHp;
+import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveAPI;
 import org.rise.activeSkills.ActiveListener;
 import org.rise.activeSkills.ConstantEffect;
@@ -52,6 +53,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static org.rise.State.Attr.*;
 
 public class
 riseA extends JavaPlugin implements Listener {
@@ -107,7 +110,7 @@ riseA extends JavaPlugin implements Listener {
     public static Map<String, PotionEffectType> buffMap = new HashMap<>();
     public static Map<String, TalentType> talentMap = new HashMap<>();
     public static Map<TalentType, String> talentMapReflect = new HashMap<>();
-    public static Map<AttrModifier.Attr, String> attrName = new HashMap<>();
+    public static Map<Attr, String> attrName = new HashMap<>();
     public static double critChanceMax;
     public static double critRateMin;
     public static double critRateDefault;
@@ -169,9 +172,9 @@ riseA extends JavaPlugin implements Listener {
     public static class playerSelectData {
         public String type;
         public String slot;
-        public AttrModifier.Attr attr;
+        public Attr attr;
 
-        public playerSelectData(String t, String s, AttrModifier.Attr a) {
+        public playerSelectData(String t, String s, Attr a) {
             type = t;
             slot = s;
             attr = a;
@@ -200,38 +203,38 @@ riseA extends JavaPlugin implements Listener {
         config = getConfig();
         //关键词读取
         critChanceS = config.getString("critChance");
-        attrName.put(AttrModifier.Attr.CRIT, critChanceS);
+        attrName.put(CRIT, critChanceS);
         critRateS = config.getString("critRate");
-        attrName.put(AttrModifier.Attr.CRIT_RATE, critRateS);
+        attrName.put(CRIT_RATE, critRateS);
         headshotRateS = config.getString("headshotRate");
-        attrName.put(AttrModifier.Attr.HEADSHOT_RATE, headshotRateS);
+        attrName.put(HEADSHOT_RATE, headshotRateS);
         nonHeadshotS = config.getString("nonHeadshot");
         damageS = config.getString("damage");
-        attrName.put(AttrModifier.Attr.DAMAGE, damageS);
+        attrName.put(DAMAGE, damageS);
         finalDamageS = config.getString("finalDamage");
-        attrName.put(AttrModifier.Attr.FINAL_DAMAGE, finalDamageS);
+        attrName.put(FINAL_DAMAGE, finalDamageS);
         trueDamageS = config.getString("trueDamage");
-        attrName.put(AttrModifier.Attr.TRUE_DAMAGE, trueDamageS);
+        attrName.put(TRUE_DAMAGE, trueDamageS);
         hpS = config.getString("hp");
-        attrName.put(AttrModifier.Attr.HP, hpS);
+        attrName.put(HP, hpS);
         percentHpS = config.getString("percentHp");
-        attrName.put(AttrModifier.Attr.PERCENT_DAMAGE, percentHpS);
+        attrName.put(PERCENT_DAMAGE, percentHpS);
         hpRegenS = config.getString("hpRegen");
-        attrName.put(AttrModifier.Attr.HP_REGEN, hpRegenS);
+        attrName.put(HP_REGEN, hpRegenS);
         physicalResistanceS = config.getString("physicalResistance");
-        attrName.put(AttrModifier.Attr.PHYSICAL_RESISTANCE, physicalResistanceS);
+        attrName.put(PHYSICAL_RESISTANCE, physicalResistanceS);
         specialResistanceS = config.getString("specialResistance");
-        attrName.put(AttrModifier.Attr.SPECIAL_RESISTANCE, specialResistanceS);
+        attrName.put(SPECIAL_RESISTANCE, specialResistanceS);
         physicalPiercingS = config.getString("physicalPiercing");
-        attrName.put(AttrModifier.Attr.PHYSICAL_PIERCING, physicalPiercingS);
+        attrName.put(PHYSICAL_PIERCING, physicalPiercingS);
         avoidRateS = config.getString("avoidRate");
-        attrName.put(AttrModifier.Attr.AVOID, avoidRateS);
+        attrName.put(AVOID, avoidRateS);
         hitRateS = config.getString("hitRate");
-        attrName.put(AttrModifier.Attr.HIT, hitRateS);
+        attrName.put(HIT, hitRateS);
         speedS = config.getString("speed");
-        attrName.put(AttrModifier.Attr.SPEED, speedS);
+        attrName.put(SPEED, speedS);
         percentDamageS = config.getString("percentDamage");
-        attrName.put(AttrModifier.Attr.PERCENT_DAMAGE, percentDamageS);
+        attrName.put(PERCENT_DAMAGE, percentDamageS);
         buffGiverS = config.getString("buffGiver");
         overChargeS = config.getString("overCharge");
         suitMarkS = config.getString("suitMark");
@@ -239,25 +242,25 @@ riseA extends JavaPlugin implements Listener {
         typeMarkS = config.getString("typeMark");
         healthBuffS = config.getString("healthBuff");
         expBounceS = config.getString("expBounce");
-        attrName.put(AttrModifier.Attr.EXP_BOUNCE, expBounceS);
+        attrName.put(EXP_BOUNCE, expBounceS);
         onKillRegenS = config.getString("onKillRegen");
-        attrName.put(AttrModifier.Attr.ON_KILL_REGEN, onKillRegenS);
+        attrName.put(ON_KILL_REGEN, onKillRegenS);
         nfAbilityS = config.getString("nfAbility");
-        attrName.put(AttrModifier.Attr.NF_ABILITY, nfAbilityS);
+        attrName.put(NF_ABILITY, nfAbilityS);
         debuffResistanceS = config.getString("debuffResistance");
-        attrName.put(AttrModifier.Attr.DEBUFF_RESISTANCE, debuffResistanceS);
+        attrName.put(DEBUFF_RESISTANCE, debuffResistanceS);
         skillLevelS = config.getString("skillLevel");
-        attrName.put(AttrModifier.Attr.SKILL_LEVEL, skillLevelS);
+        attrName.put(SKILL_LEVEL, skillLevelS);
         skillDamageS = config.getString("skillDamage");
-        attrName.put(AttrModifier.Attr.SKILL_DAMAGE, skillDamageS);
+        attrName.put(SKILL_DAMAGE, skillDamageS);
         debuffEffectS = config.getString("debuffEffect");
-        attrName.put(AttrModifier.Attr.DEBUFF_EFFECT, debuffEffectS);
+        attrName.put(DEBUFF_EFFECT, debuffEffectS);
         recoverEffectS = config.getString("recoverEffect");
-        attrName.put(AttrModifier.Attr.RECOVER_EFFECT, recoverEffectS);
+        attrName.put(RECOVER_EFFECT, recoverEffectS);
         skillAccelerateS = config.getString("skillAccelerate");
-        attrName.put(AttrModifier.Attr.SKILL_ACCELERATE, skillAccelerateS);
+        attrName.put(SKILL_ACCELERATE, skillAccelerateS);
         pulseResistanceS = config.getString("pulseResistance");
-        attrName.put(AttrModifier.Attr.PULSE_RESISTANCE, pulseResistanceS);
+        attrName.put(PULSE_RESISTANCE, pulseResistanceS);
         bindingS = config.getString("binding");
         notBelongS = config.getString("notBelong");
         talentS = config.getString("talent");
@@ -302,6 +305,7 @@ riseA extends JavaPlugin implements Listener {
         revivedSound = config.getString("revived");
         npcFriendly.addAll(config.getIntegerList("npc-friend"));
         npcEnemy.addAll(config.getIntegerList("npc-enemy"));
+        attrName.put(DAMAGE_RECEIVE, "受到伤害比例");
         ConfigurationSection pressSkill = config.getConfigurationSection("pressSkill");
         for (String i : pressSkill.getKeys(false)) {
             pressSkillMap.put(pressSkill.getString(i), i);
@@ -508,8 +512,8 @@ riseA extends JavaPlugin implements Listener {
                 }
                 if (args.length == 2 && Objects.equals(args[0], "exhp")) {
                     Player player = (Player) sender;
-                    RAstate state = EntityInf.getPlayerState(player);
-                    state.addExHp(new RAstate.extraHp(Double.parseDouble(args[1]), 30));
+                    RAState state = EntityInf.getPlayerState(player);
+                    state.addExHp(new ExtraHp(Double.parseDouble(args[1]), 30));
                     EntityInf.putPlayerState(player, state);
                 }
                 if (Objects.equals(args[0], "s")) {

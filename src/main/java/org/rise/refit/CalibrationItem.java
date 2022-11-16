@@ -1,7 +1,7 @@
 package org.rise.refit;
 
 import org.bukkit.inventory.ItemStack;
-import org.rise.State.AttrModifier;
+import org.rise.State.Attr;
 import org.rise.extra.Pair;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
@@ -16,19 +16,19 @@ import java.util.regex.Pattern;
 public class CalibrationItem {
     public ItemStack self;
     public String type;
-    public Map<String, List<Pair<AttrModifier.Attr, Double>>> data = new HashMap<>();
+    public Map<String, List<Pair<Attr, Double>>> data = new HashMap<>();
     public Map<String, List<Integer>> dataPos = new HashMap<>();
     public TalentType talent;
     public boolean calibrated = false;
     public int caliPos = 0;
-    public AttrModifier.Attr caliAttr;
+    public Attr caliAttr;
     public String caliType;
     public int level;
 
-    public double getAttrNum(String id, AttrModifier.Attr attr) {
-        List<Pair<AttrModifier.Attr, Double>> res = data.get(id);
+    public double getAttrNum(String id, Attr attr) {
+        List<Pair<Attr, Double>> res = data.get(id);
         if (res == null) return 0;
-        for (Pair<AttrModifier.Attr, Double> i : res) {
+        for (Pair<Attr, Double> i : res) {
             if (i.getKey() == attr) {
                 return i.getValue();
             }
@@ -65,18 +65,18 @@ public class CalibrationItem {
                     for (String na : riseA.refitBaseMap.keySet()) {
                         RefitBase tmp = riseA.refitBaseMap.get(na);
                         if (!s.contains(tmp.prefix)) continue;
-                        List<Pair<AttrModifier.Attr, Double>> res = data.get(tmp.id);
+                        List<Pair<Attr, Double>> res = data.get(tmp.id);
                         List<Integer> pos = dataPos.get(tmp.id);
                         if (res == null) res = new LinkedList<>();
                         if (pos == null) pos = new LinkedList<>();
-                        for (AttrModifier.Attr i : riseA.attrName.keySet()) {
+                        for (Attr i : riseA.attrName.keySet()) {
                             if (s.contains(riseA.attrName.get(i))) {
                                 String t = s.replaceAll("§[0-9]", "§f");
                                 Pattern p = Pattern.compile("[0-9]+(\\.[0-9]+)?");
                                 Matcher m = p.matcher(t);
                                 double num = 0;
                                 if (m.find()) num = Double.parseDouble(m.group());//只加第一次出现的浮点数
-                                Pair<AttrModifier.Attr, Double> t1 = new Pair<>(i, num);
+                                Pair<Attr, Double> t1 = new Pair<>(i, num);
                                 res.add(t1);
                                 pos.add(lore.indexOf(s));
                                 if (s.contains(riseA.calibratedMarkS)) {

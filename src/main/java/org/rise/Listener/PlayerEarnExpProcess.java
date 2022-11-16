@@ -6,7 +6,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.rise.EntityInf;
-import org.rise.State.RAstate;
+import org.rise.State.Attr;
+import org.rise.State.RAState;
 
 import java.util.UUID;
 
@@ -16,8 +17,8 @@ public class PlayerEarnExpProcess implements Listener {
         int amount = event.getAmount();
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-        RAstate state = EntityInf.playersAttr.get(uuid);
-        amount = (int) Math.ceil(1.0 * amount * (1 + state.expBounce / 100.0));
+        RAState state = EntityInf.playersAttr.get(uuid);
+        amount = (int) Math.ceil(1.0 * amount * (1 + state.getAttr(Attr.EXP_BOUNCE) / 100.0));
         event.setAmount(amount);
     }
 }
