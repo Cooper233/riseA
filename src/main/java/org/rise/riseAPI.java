@@ -41,10 +41,7 @@ public class riseAPI implements Listener {
     }
 
     public static void resetPlayerAttr(Player player) {
-        RAState state;
-        if (EntityInf.playersAttr.containsKey(player.getUniqueId()))
-            state = EntityInf.playersAttr.get(player.getUniqueId());
-        else state = new RAState();
+        RAState state = new RAState();
         state.setDefault();
         state.initAll(player);
         EntityInf.playersAttr.put(player.getUniqueId(), state.analyze(1, player));

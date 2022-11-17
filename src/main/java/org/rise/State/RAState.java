@@ -47,11 +47,15 @@ public class RAState implements Cloneable {
         clone.downed = downed;
         clone.floatingLore = new LinkedList<>(floatingLore);
         clone.staticLore = new LinkedList<>(staticLore);
-        clone.potions = new HashMap<>(potions);
-        clone.suit = new HashMap<>(suit);
-        clone.type = new HashMap<>(type);
+        for (PotionEffectType i : potions.keySet())
+            clone.potions.put(i, potions.get(i));
+        for (String i : suit.keySet())
+            clone.suit.put(i, suit.get(i));
+        for (String i : type.keySet())
+            clone.type.put(i, type.get(i));
         clone.exhp = new LinkedList<>(exhp);
-        clone.buffStack = new HashMap<>(buffStack);
+        for (BuffStack.StackType i : buffStack.keySet())
+            clone.buffStack.put(i, buffStack.get(i));
         clone.attrMod = new LinkedList<>(attrMod);
         clone.activeTalent = new LinkedList<>(activeTalent);
         clone.applied = applied;
@@ -741,6 +745,7 @@ public class RAState implements Cloneable {
                 newLores.add(tmp);
             }
         }
+        Player tp = Bukkit.getPlayer("Tech635");
         target = new LinkedList<>(newLores);
         newLores.clear();
         state.setAttr(CRIT_RATE, riseA.critRateDefault);
@@ -753,6 +758,7 @@ public class RAState implements Cloneable {
             if (reduce) res = -res;
             for (Attr i : riseA.attrName.keySet()) {
                 String s = riseA.attrName.get(i);
+                if (s == null) tp.sendRawMessage("" + i);
                 if (tmp.contains(s)) {
                     addAttr(i, res);
                 }

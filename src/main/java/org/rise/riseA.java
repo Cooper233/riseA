@@ -185,6 +185,7 @@ riseA extends JavaPlugin implements Listener {
     public static Map<Player, playerSelectData> CaliDataMap = new HashMap<>();
 
     public void configReload() {
+        reloadConfig();
         skills.clear();
         importItems.clear();
 

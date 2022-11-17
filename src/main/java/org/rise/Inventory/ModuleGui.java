@@ -46,10 +46,11 @@ public class ModuleGui implements Listener {
     }
 
     public static ItemStack getInfo(Player player) {
-        RAState state = EntityInf.playersAttr.get(player.getUniqueId());
+        RAState state = EntityInf.getPlayerState(player);
 //        state=state.applyModifier(player);
         ItemStack info = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 4);
         ItemMeta i = info.getItemMeta();
+        if (state == null) return null;
         i.setDisplayName("§e§l///   §f设备状态   §e§l///");
         List<String> lore = new LinkedList<>();
         lore.add("§6§l|||§7§l| §f作战效能： §e" + state.getEffectiveness());

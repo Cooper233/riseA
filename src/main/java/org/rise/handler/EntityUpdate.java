@@ -126,6 +126,8 @@ public class EntityUpdate {
             for (Player tmp : data) {
                 UUID uuid = tmp.getUniqueId();
                 RAState state = EntityInf.getPlayerState(tmp);
+                if (state == null) riseAPI.resetPlayerAttr(tmp);
+                state = EntityInf.getPlayerState(tmp).analyze(2, tmp);
                 exhpGUI.barCheck(tmp);
                 ModuleGui.guiList.get(uuid).setItem(8, ModuleGui.getInfo(tmp));
                 BuffStack.stackEffect(state.buffStack, tmp);

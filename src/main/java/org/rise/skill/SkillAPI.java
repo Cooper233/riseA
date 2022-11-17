@@ -24,7 +24,7 @@ public class SkillAPI {
                 if (EntityInf.cdProgress.containsKey(skill.cd_type)) {
                     Map<UUID, Long> t = EntityInf.cdProgress.get(skill.cd_type);
                     if (t.containsKey(entity.getUniqueId()) && t.get(entity.getUniqueId()) > 0) {
-                        entity.sendMessage("§f[§6ISAAC§f]§4技能冷却中!剩余时间: §f" + t.get(entity.getUniqueId()) / state.getAttr(Attr.SKILL_ACCELERATE) / 1000 + "§4 秒！");
+                        entity.sendMessage("§f[§6ISAAC§f]§4技能冷却中!剩余时间: §f" + t.get(entity.getUniqueId()) / (1.0 + state.getAttr(Attr.SKILL_ACCELERATE) / 100) / 1000 + "§4 秒！");
                         return false;
                     }
                 }

@@ -3,7 +3,6 @@ package org.rise.activeSkills.effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.rise.EntityInf;
@@ -13,8 +12,11 @@ import org.rise.activeSkills.ConstantEffect;
 import org.rise.skill.Enable.EnableEffectBase;
 import org.rise.skill.SkillAPI;
 import org.rise.skill.SkillBase;
+import org.rise.utils.RayTraceUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class BfbBase extends ActiveBase {
     public double range;
@@ -28,7 +30,6 @@ public abstract class BfbBase extends ActiveBase {
 
     public void Indicator(Player player, Location loc, double r) {
 
-        loc.add(0, 1.2, 0);
         MaterialData data = new MaterialData(Material.STAINED_GLASS);
         data.setData(color);
         for (double a = 0; a < 360; a += 60 / r) {
@@ -38,8 +39,6 @@ public abstract class BfbBase extends ActiveBase {
             player.spawnParticle(Particle.BLOCK_CRACK, loc, 2, 0, 0, 0, 0, data);
             loc.subtract(r * Math.cos(rad), 0, r * Math.sin(rad));
         }
-
-        loc.subtract(0, 1.2, 0);
     }
 
     @Override
@@ -55,10 +54,7 @@ public abstract class BfbBase extends ActiveBase {
 //                return entity.getLocation();
 //            }
 //        }
-        Set<Material> set = new HashSet<>(Arrays.asList(Material.AIR, Material.GRASS, Material.TORCH));
-        Block block = player.getTargetBlock(null, (int) (maxFlyingRange));
-        if (block == null) return null;
-        return block.getType() == Material.AIR ? null : block.getLocation();
+        return RayTraceUtils.CurrentHitLoc(player.getEyeLocation(), player.getLocation().getDirection(), 50, Arrays.asList(player));
     }
 
     @Override
@@ -79,7 +75,6 @@ public abstract class BfbBase extends ActiveBase {
             double r = this.range * mod;
             Location loc = getTargetLoc(player);
             if (loc != null) {
-                loc.add(0, 1.2, 0);
                 SkillBase skill = getSkill(state);
                 SkillAPI.performSkill(player, loc, skill, false);
                 Indicator(player, loc, r);
@@ -87,7 +82,6 @@ public abstract class BfbBase extends ActiveBase {
                 data.setData(color);
                 player.getWorld().spawnParticle(Particle.FALLING_DUST, loc, 45, r, 0.3, r, 0.3, data);
                 player.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc, 45, r, 0.3, r, 0.3, data);
-                loc.add(0, -1.2, 0);
             } else {
                 player.sendMessage("§f[§6ISAAC§f]已取消射击§c【射程不足】");
             }
