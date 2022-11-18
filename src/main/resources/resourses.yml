@@ -1,33 +1,33 @@
 list:
-  res_elec:
-  res_metal:
-  res_gearbox:
-  res_cloth:
-  res_china:
-  res_rf:
-  res_smg:
-  res_ar:
-  res_dmr:
-  res_sg:
-  res_mg:
-  res_hg:
-  brand_barrier:
-  brand_frontline:
-  brand_rick:
-  brand_quin:
-  brand_spank:
-  brand_dell:
-  brand_lasdimo:
-  brand_wild:
-  brand_hunter:
-  brand_t115:
-  brand_yell:
-  brand_mica:
-  brand_ligth:
-  brand_golan:
-  brand_agate:
-  brand_hall:
-  brand_miku:
+  - res_elec
+  - res_metal
+  - res_gearbox
+  - res_cloth
+  - res_china
+  - res_rf
+  - res_smg
+  - res_ar
+  - res_dmr
+  - res_sg
+  - res_mg
+  - res_hg
+  - brand_barrier
+  - brand_frontline
+  - brand_rick
+  - brand_quin
+  - brand_spank
+  - brand_dell
+  - brand_lasdimo
+  - brand_wild
+  - brand_hunter
+  - brand_t115
+  - brand_yell
+  - brand_mica
+  - brand_ligth
+  - brand_golan
+  - brand_agate
+  - brand_hall
+  - brand_miku
 dismantle:
   equipment:
     types: [ "头盔","胸甲","枪套","护膝","背包","胸挂","普通装备" ]

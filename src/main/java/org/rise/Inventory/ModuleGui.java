@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.rise.EntityInf;
+import org.rise.State.ExtraHp;
 import org.rise.State.RAState;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
@@ -54,7 +55,7 @@ public class ModuleGui implements Listener {
         i.setDisplayName("§e§l///   §f设备状态   §e§l///");
         List<String> lore = new LinkedList<>();
         lore.add("§6§l|||§7§l| §f作战效能： §e" + state.getEffectiveness());
-        lore.add("§b>> §f额外生命值: §e" + state.getTotalExHp());
+        lore.add("§b>> §f额外生命值: §e" + ExtraHp.getTotalExhp(EntityInf.getEntityExtraHp(player)));
         lore.add("");
         lore.add("§6§l|||§7§l| §f已启用的天赋:");
         for (TalentType j : state.activeTalent) {
@@ -104,7 +105,7 @@ public class ModuleGui implements Listener {
     public static void saveGui(Player player, Inventory inv) {
         ItemStack s1 = inv.getItem(11), s2 = inv.getItem(12), s3 = inv.getItem(13), sk1 = inv.getItem(15), sk2 = inv.getItem(24);
         ItemStack[] eq = new ItemStack[7];
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 0; i < 6; i++) {
             eq[i] = inv.getItem(26 + i);
         }
         File loc = new File(riseA.modFolder, player.getName() + ".yml");

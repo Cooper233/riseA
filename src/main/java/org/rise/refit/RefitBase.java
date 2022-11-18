@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RefitBase {
     public static List<String> refitType = new LinkedList<>();
@@ -49,6 +51,17 @@ public class RefitBase {
         return (int) (Math.floor(Math.random() * 10000000) % n);
     }
 
+    public static int getInt(String s) {
+        int res = 0;
+        s = s.replaceAll("§[0-9]", "§f");
+        Pattern p = Pattern.compile("[0-9]+");
+        Matcher m = p.matcher(s);
+        if (m.find()) {
+            res = Integer.parseInt(m.group());
+        }
+        return res;
+    }
+
     public static boolean performRefit(ItemStack ori) {
         Player tp = Bukkit.getPlayer("Tech635");
         List<String> used = new LinkedList<>();
@@ -64,49 +77,44 @@ public class RefitBase {
         int level = 0;
         for (String s : lore) {
             if (s.contains(riseA.levelMarkS)) {
-                if (s.contains("I")) level = 1;
-                if (s.contains("II")) level = 2;
-                if (s.contains("III")) level = 3;
-                if (s.contains("IV")) level = 4;
-                if (s.contains("V")) level = 5;
+                String[] tt = s.split(riseA.levelMarkS);
+                String tmp = s.replaceAll(riseA.levelMarkS, "").replaceAll("§[0-9,a-z]", "");
+                if (tmp.contains("~")) {
+                    String[] t = tmp.split("~");
+                    int min = getInt(t[0]), max = getInt(t[1]);
+                    level = getrand(max - min) + min;
+                    s = tt[0] + riseA.levelMarkS + " §e§l" + level;
+                } else {
+                    level = getInt(tmp);
+                }
             } else if (s.contains(riseA.refitMarkS)) {
                 kind = s.replaceAll(riseA.refitMarkS, "");
             } else if (kind != null) {
                 for (String na : riseA.refitBaseMap.keySet()) {
                     RefitBase tmp = riseA.refitBaseMap.get(na);
                     if (!s.contains(tmp.mark)) continue;
+
                     double high = 0, low = 0;
-                    switch (level) {
-                        case 1: {
-                            high = 5;
-                            break;
-                        }
-                        case 2: {
-                            high = 15;
-                            break;
-                        }
-                        case 3: {
-                            high = 30;
-                            break;
-                        }
-                        case 4: {
-                            low = 10;
-                            high = 60;
-                            break;
-                        }
-                        case 5: {
-                            low = 40;
-                            high = 100;
-                            break;
-                        }
+                    high = 100.0 * level / 500;
+                    if (level > 100) {
+                        low = 80.0 * (level - 100) / 400;
                     }
                     double t = getrand((int) (high + 1 - low)) + low;
                     double t1 = t;
                     t = t / 100.0;
                     List<RefitSlotBase> tt = tmp.refits.get(kind);
+
                     int x = getrand(tt.size());
                     while (used.contains(tmp.mark + x)) x = getrand(tt.size());
                     RefitSlotBase slot = tt.get(x);
+                    if (s.contains("槽位限定")) {
+                        for (RefitSlotBase b : tt) {
+                            if (s.contains(riseA.attrName.get(b.type))) {
+                                slot = b;
+                                break;
+                            }
+                        }
+                    }
                     t = (slot.max - slot.min) * t + slot.min;
                     String res = tmp.prefix + "§l❯§f";
                     double rs = Math.floor(t * 100) / 100;

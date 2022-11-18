@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class EquipSelectGUI implements Listener {
+    //TODO: 这里bug了，界面打不开
     private static void addItemComponent(Player player, String type, VexScrollingList list, CalibrationItem item, int pos) {
         VexSlot slot = new VexSlot(1100 + pos, 5, 4 + 20 * pos, item.self);
         VexText text = new VexText(25, 4 + 20 * pos, Arrays.asList(item.self.getItemMeta().getDisplayName()));

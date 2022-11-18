@@ -15,9 +15,7 @@ public class EntityDeathProcess implements Listener {
         UUID uuid = event.getEntity().getUniqueId();
         EntityInf.entityModifier.remove(uuid);
         if (Bukkit.getPlayer(uuid) != null) {
-            RAState tmp = EntityInf.getPlayerState(uuid);
-            assert tmp != null;
-            tmp.AllDefault();
+            RAState tmp = new RAState();
             EntityInf.playersAttr.put(uuid, tmp);
         }
         EntityInf.entityStack.remove(uuid);

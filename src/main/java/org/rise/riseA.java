@@ -31,7 +31,6 @@ import org.rise.Inventory.ModuleL3;
 import org.rise.Listener.*;
 import org.rise.State.Attr;
 import org.rise.State.ExtraHp;
-import org.rise.State.RAState;
 import org.rise.activeSkills.ActiveAPI;
 import org.rise.activeSkills.ActiveListener;
 import org.rise.activeSkills.ConstantEffect;
@@ -512,10 +511,7 @@ riseA extends JavaPlugin implements Listener {
                     inv.setItemInMainHand(a);
                 }
                 if (args.length == 2 && Objects.equals(args[0], "exhp")) {
-                    Player player = (Player) sender;
-                    RAState state = EntityInf.getPlayerState(player);
-                    state.addExHp(new ExtraHp(Double.parseDouble(args[1]), 30));
-                    EntityInf.putPlayerState(player, state);
+                    ExtraHp.addExHp(EntityInf.getEntityExtraHp((Entity) sender), new ExtraHp(Double.parseDouble(args[1]), 30000), (Entity) sender);
                 }
                 if (Objects.equals(args[0], "s")) {
                     if (args.length == 2) {
@@ -796,7 +792,7 @@ riseA extends JavaPlugin implements Listener {
         configReload();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.EntitySecondlyCheck, 0L, 20L);
-        scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.playerSecondlyCheck, 0L, 20L);
+        scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.playerSecondlyCheck, 0L, 60L);
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.playerTicklyCheck, 0L, 1L);
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.EntityTicklyCheck, 0, 1L);
         scheduler.scheduleSyncRepeatingTask(this, ConstantEffect.secondlyCheck, 0, 20L);

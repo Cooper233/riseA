@@ -17,10 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import org.rise.*;
 import org.rise.GUI.exhpGUI;
-import org.rise.State.Attr;
-import org.rise.State.AttrModifier;
-import org.rise.State.BuffStack;
-import org.rise.State.RAState;
+import org.rise.State.*;
 import org.rise.activeSkills.ConstantEffect;
 import org.rise.activeSkills.effect.ActiveBase;
 import org.rise.activeSkills.effect.ShieldBase;
@@ -63,14 +60,15 @@ public class EntityAttackProcess implements Listener {
             defState = EntityInf.getPlayerState((Player) def);
             long time = System.currentTimeMillis();
             long pt = 2500;
-            if (world.getName().startsWith("pvp")) pt = 100;
+            if (world.getName().toLowerCase().startsWith("pvp")) pt = 100;
             if (time - EntityInf.getLastProtect(def) <= pt) {
                 event.setCancelled(true);
                 return;
             }
         }
         defState.AllDefault();
-        if (def instanceof Player) defState = EntityInf.getPlayerState(def.getUniqueId()).analyze(2, def);
+        if (def instanceof Player)
+            defState = Objects.requireNonNull(EntityInf.getPlayerState(def.getUniqueId())).analyze(2, def);
         else defState = EntityInf.getEntityState(def);
         LivingEntity att = null;
         Entity damager = event.getDamager();
@@ -97,7 +95,8 @@ public class EntityAttackProcess implements Listener {
         }
         if (att == null) return;
         if (att instanceof Player && def instanceof Player) {
-            if (!world.getName().startsWith("pvp")) {
+//            tp.sendMessage(world.getName());
+            if (!world.getName().toLowerCase().startsWith("pvp")) {
                 event.setCancelled(true);
                 return;
             } else if (TeamBase.getNowTeam((Player) att) == TeamBase.getNowTeam((Player) def) && TeamBase.getNowTeam((Player) att) != null) {
@@ -105,10 +104,12 @@ public class EntityAttackProcess implements Listener {
                 return;
             }
         }
-        RAState attState = new RAState();
-        attState.AllDefault();
-        if (att instanceof Player) attState = EntityInf.getPlayerState((Player) att).analyze(2, att);
-        else attState = EntityInf.getEntityState(att);
+        RAState attState;
+        if (att instanceof Player) {
+            attState = EntityInf.getPlayerState((Player) att);
+            attState.init(att);
+            attState = attState.analyze(2, att);
+        } else attState = EntityInf.getEntityState(att);
 //        tp.sendMessage("2");
         if (attState.downed) {
             event.setCancelled(true);
@@ -117,6 +118,8 @@ public class EntityAttackProcess implements Listener {
 
         attState = attState.applyModifier(att);
         defState = defState.applyModifier(def);
+        Map<BuffStack.StackType, Integer> attStackMap = EntityInf.getEntityStack(att);
+        Map<BuffStack.StackType, Integer> defStackMap = EntityInf.getEntityStack(def);
         if (att instanceof Player && ConstantEffect.usingShield.contains(att.getUniqueId())) {
             if (System.currentTimeMillis() - ConstantEffect.lastUseShield.get(att.getUniqueId()) <= 500) {
                 event.setCancelled(true);
@@ -223,8 +226,9 @@ public class EntityAttackProcess implements Listener {
         bfDamage += Math.min(riseA.trueDamageMax, attState.getAttr(TRUE_DAMAGE));
         damage *= (100 - defState.getAttr(SPECIAL_RESISTANCE)) / 100;
         if (def instanceof Player) {
-            damage = defState.resistDamage(damage);
-            EntityInf.playersAttr.put(def.getUniqueId(), defState);
+            List<ExtraHp> list = EntityInf.getEntityExtraHp(def);
+            damage = ExtraHp.resistDamage(list, damage);
+            EntityInf.setEntityExtraHp(def, list);
         }
         event.setDamage(damage);
         double fd = event.getFinalDamage();
@@ -400,7 +404,7 @@ public class EntityAttackProcess implements Listener {
                         SkillBase skill = new SkillBase("停搏", 0, 1, 0, "ASYSTOLE", Arrays.asList(new EffectStack(BuffStack.StackType.PULSE_AFFECT, 50, TargetBase.SELF)));
                         SkillAPI.performSkill(def, skill, false);
                     }
-                    if (defState.buffStack.containsKey(BuffStack.StackType.PULSE_AFFECT)) {
+                    if (EntityInf.getEntityStack(def).containsKey(BuffStack.StackType.PULSE_AFFECT)) {
                         damage *= 1.15;
                     }
                     break;
@@ -514,8 +518,9 @@ public class EntityAttackProcess implements Listener {
                 }
                 case CHAMELEON: {
                     if (ifDodged) break;
+
                     if (ifHeadshot) {
-                        int head = attState.getStackNum(BuffStack.StackType.CHAMELEON_HEAD);
+                        int head = BuffStack.getStackNum(attStackMap, BuffStack.StackType.CHAMELEON_HEAD);
 //                        tp.sendMessage("HEAD:"+head);
                         if (head == 14) {
                             riseAPI.addBuffStack(att, BuffStack.StackType.CHAMELEON_HEAD, -14);
@@ -529,7 +534,7 @@ public class EntityAttackProcess implements Listener {
                             }
                         }
                     } else {
-                        int body = attState.getStackNum(BuffStack.StackType.CHAMELEON_BODY);
+                        int body = BuffStack.getStackNum(attStackMap, BuffStack.StackType.CHAMELEON_BODY);
 //                        tp.sendMessage("BODY:"+body);
                         if (body == 29) {
                             riseAPI.addBuffStack(att, BuffStack.StackType.CHAMELEON_BODY, -29);
@@ -559,7 +564,7 @@ public class EntityAttackProcess implements Listener {
                         SkillAPI.performSkill(att, skill, false);
                     }
                     if (attState.hasType("无尽锻造")) {
-                        int num = attState.getStackNum(BuffStack.StackType.RISK);
+                        int num = BuffStack.getStackNum(attStackMap, BuffStack.StackType.RISK);
                         if (num >= 4) {
                             riseAPI.addBuffStack(att, BuffStack.StackType.RISK, -4);
                             damage *= 2.5;
@@ -573,7 +578,7 @@ public class EntityAttackProcess implements Listener {
                     break;
                 }
                 case PATHFINDER: {
-                    if (attState.getTotalExHp() > 0.1) {
+                    if (ExtraHp.getTotalExhp(EntityInf.getEntityExtraHp(att)) > 0.1) {
                         damage *= 1.2;
                     }
                     break;
@@ -761,7 +766,7 @@ public class EntityAttackProcess implements Listener {
     @EventHandler
     public void playerExecution(KeyBoardPressEvent event) {
         Player player = event.getPlayer();
-        if (!player.getWorld().getName().startsWith("pvp")) return;
+        if (!player.getWorld().getName().toLowerCase().startsWith("pvp")) return;
         int key = event.getKey();
         if (MinecraftKeys.KEY_TAB.isTheKey(key) && event.getEventKeyState()) {
             List<Player> list = new LinkedList<>();
@@ -773,12 +778,13 @@ public class EntityAttackProcess implements Listener {
                     }
                 }
             }
-            player.sendMessage("§4[§f叛变协议§4]§c已处决玩家 " + list.get(0).getDisplayName() + " §c！");
-            player.playSound(player.getLocation(), riseA.killedSound, 16, 1);
-            list.get(0).setHealth(0);
-            PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 20, 3);
-            effect.apply(player);
-
+            if (list.size() > 0) {
+                player.sendMessage("§4[§f叛变协议§4]§c已处决玩家 " + list.get(0).getDisplayName() + " §c！");
+                player.playSound(player.getLocation(), riseA.killedSound, 16, 1);
+                list.get(0).setHealth(0);
+                PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 20, 3);
+                effect.apply(player);
+            }
         }
     }
 }

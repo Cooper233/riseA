@@ -1,17 +1,16 @@
 package org.rise;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
+import org.rise.State.ExtraHp;
 import org.rise.State.RAState;
 import org.rise.effect.CustomEffectBase;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class EntityInf {
     public static Map<UUID, UUID> revivingMap = new HashMap<>();//救助者-被救助者
@@ -20,10 +19,11 @@ public class EntityInf {
     public static Map<String, Map<UUID, Long>> lastSkillAffect = new HashMap<>();
     public static Map<String, Map<UUID, Long>> cdProgress = new HashMap<>();
     public static Map<UUID, RAState> playersAttr = new HashMap<>();//玩家的属性表，UUID-RAstate
-    public static Map<UUID, List<AttrModifier>> entityModifier = new HashMap<>();//实体的属性修改
+    public static Map<UUID, List<AttrModifier>> entityModifier = new HashMap<>();//实体的属性修改（包括玩家）
     public static Map<UUID, List<CustomEffectBase>> entityEffect = new HashMap<>();//实体的状态效果
     public static Map<UUID, Map<BuffStack.StackType, Integer>> entityStack = new HashMap<>();//实体的叠层
     public static Map<UUID, Map<BuffStack.StackType, Long>> entityLastStackReduce = new HashMap<>();//实体的每个上一次叠层减少
+    public static Map<UUID, List<ExtraHp>> entityExtraHp = new HashMap<>();
     public static Map<UUID, UUID> indirectDamage = new HashMap<>();//临时创建实体来进行攻击的对照表（临时实体-攻击源）
     public static Map<UUID, Long> lastAttack = new HashMap<>();//实体的上一次攻击时间（没有的话默认为0）
     public static Map<UUID, Double> lastAttackAmount = new HashMap<>();//实体的上一次攻击伤害（没有的话默认为0）
@@ -49,6 +49,7 @@ public class EntityInf {
         lastProtect.clear();
         lastSkillAttack.clear();
         lastKilled.clear();
+        entityExtraHp.clear();
         lastCrit.clear();
         lastDodge.clear();
         lastAttack.clear();
@@ -57,13 +58,55 @@ public class EntityInf {
         lastRevive.clear();
     }
 
+    public static List<ExtraHp> getEntityExtraHp(Entity entity) {
+        return entityExtraHp.getOrDefault(entity.getUniqueId(), new LinkedList<>());
+    }
+
+    public static void setEntityExtraHp(Entity entity, List<ExtraHp> list) {
+        if (list == null) list = new LinkedList<>();
+        entityExtraHp.put(entity.getUniqueId(), list);
+    }
+
+    public static Map<BuffStack.StackType, Integer> getEntityStack(Entity entity) {
+        if (entityStack.containsKey(entity.getUniqueId())) return entityStack.get(entity.getUniqueId());
+        return new HashMap<>();
+    }
+
+    public static void setEntityStack(Entity entity, Map<BuffStack.StackType, Integer> map) {
+        if (map == null) map = new HashMap<>();
+        entityStack.put(entity.getUniqueId(), map);
+    }
+
+    public static Map<BuffStack.StackType, Long> getEntityLastStackReduce(Entity entity) {
+        if (entityStack.containsKey(entity.getUniqueId())) return entityLastStackReduce.get(entity.getUniqueId());
+        return new HashMap<>();
+    }
+
+    public static void setEntityLastStackReduce(Entity entity, Map<BuffStack.StackType, Long> map) {
+        if (map == null) map = new HashMap<>();
+        entityLastStackReduce.put(entity.getUniqueId(), map);
+    }
+
+    public static List<AttrModifier> getEntityModifier(Entity entity) {
+        if (entityStack.containsKey(entity.getUniqueId()) && entityModifier.get(entity.getUniqueId()) != null)
+            return new LinkedList<>(entityModifier.get(entity.getUniqueId()));
+        return new LinkedList<>();
+    }
+
+    public static void setEntityModifier(Entity entity, List<AttrModifier> list) {
+        if (list == null) list = new LinkedList<>();
+        entityModifier.put(entity.getUniqueId(), list);
+    }
+
     public static RAState getPlayerState(UUID id) {
-        if (Bukkit.getPlayer(id) != null) return playersAttr.get(id);
+        if (Bukkit.getPlayer(id) != null) return playersAttr.get(id).clone();
         else return null;
     }
 
     public static RAState getPlayerState(Player player) {
-        return playersAttr.get(player.getUniqueId());
+        RAState state = playersAttr.get(player.getUniqueId()).clone();
+        state.init(player);
+        return state;
     }
 
     public static RAState getPlayerState(String name) {
@@ -72,12 +115,13 @@ public class EntityInf {
     }
 
     public static RAState getEntityState(LivingEntity entity) {
+        if (entity instanceof Player) return getPlayerState((Player) entity);
         if (entityAttr.containsKey(entity.getUniqueId()))
-            return entityAttr.get(entity.getUniqueId()).analyze(2, entity);
+            return entityAttr.get(entity.getUniqueId()).clone();
         RAState state = new RAState();
-        state.AllDefault();
+        state.setDefault();
         state.initAll(entity);
-        return state.analyze(1, entity).analyze(2, entity);
+        return state.analyze(1, entity).clone();
     }
 
     public static void resetEntityState(LivingEntity entity) {

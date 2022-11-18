@@ -36,7 +36,7 @@ public class EntityUpdate {
     public static void setPlayerState(Player player) {
         Player tp = Bukkit.getPlayer("Tech635");
 
-        RAState state = EntityInf.getPlayerState(player);
+        RAState state = EntityInf.getPlayerState(player).analyze(2, player);
         state = state.applyModifier(player);
         if (state.downed) {
             state.setAttr(HP, state.getAttr(HP) * 2 + 20);
@@ -125,12 +125,8 @@ public class EntityUpdate {
             Collection<? extends Player> data = Bukkit.getServer().getOnlinePlayers();
             for (Player tmp : data) {
                 UUID uuid = tmp.getUniqueId();
-                RAState state = EntityInf.getPlayerState(tmp);
-                if (state == null) riseAPI.resetPlayerAttr(tmp);
-                state = EntityInf.getPlayerState(tmp).analyze(2, tmp);
                 exhpGUI.barCheck(tmp);
                 ModuleGui.guiList.get(uuid).setItem(8, ModuleGui.getInfo(tmp));
-                BuffStack.stackEffect(state.buffStack, tmp);
             }
         }
     };
@@ -180,12 +176,12 @@ public class EntityUpdate {
         @Override
         public void run() {
             for (UUID uuid : EntityInf.entityModifier.keySet()) {
-                List<AttrModifier> tmp = EntityInf.entityModifier.get(uuid);
-                if (tmp == null) continue;
+                LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+                List<AttrModifier> tmp = EntityInf.getEntityModifier(entity);
                 while (!tmp.isEmpty() && tmp.get(0).disappear <= System.currentTimeMillis()) {
                     tmp.remove(0);
                 }
-                EntityInf.entityModifier.put(uuid, tmp);
+                EntityInf.setEntityModifier(entity, tmp);
             }
             for (UUID uuid : EntityInf.entityEffect.keySet()) {
                 List<CustomEffectBase> tmp = EntityInf.entityEffect.get(uuid);
@@ -196,16 +192,14 @@ public class EntityUpdate {
                 EntityInf.entityEffect.put(uuid, tmp);
             }
             for (UUID uuid : EntityInf.entityStack.keySet()) {
-                Map<BuffStack.StackType, Integer> tmp = EntityInf.entityStack.get(uuid);
-                if (tmp == null) continue;
-                RAState state = new RAState();
-                state.AllDefault();
-                state.lastBuffReduce = EntityInf.entityLastStackReduce.get(uuid);
-                if (state.lastBuffReduce == null) state.lastBuffReduce = new HashMap<>();
-                BuffStack.stackCheck(tmp, state);
-                EntityInf.entityStack.put(uuid, tmp);
+                LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+                Map<BuffStack.StackType, Integer> tmp = EntityInf.getEntityStack(entity);
+                RAState state = EntityInf.getEntityState(entity);
+                Map<BuffStack.StackType, Long> lastBuffReduce = EntityInf.getEntityLastStackReduce(entity);
+                BuffStack.stackCheck(tmp, lastBuffReduce, state);
+                EntityInf.setEntityStack(entity, tmp);
                 BuffStack.stackEffect(tmp, (LivingEntity) Bukkit.getEntity(uuid));
-                EntityInf.entityLastStackReduce.put(uuid, state.lastBuffReduce);
+                EntityInf.setEntityLastStackReduce(entity, lastBuffReduce);
             }
         }
     };
@@ -218,11 +212,11 @@ public class EntityUpdate {
                     CustomEffectBase.secondlyCheck((LivingEntity) Bukkit.getEntity(uuid), base);
                 }
             }
-            for (UUID uuid : EntityInf.entityStack.keySet()) {
-                Map<BuffStack.StackType, Integer> tmp = EntityInf.entityStack.get(uuid);
-                if (tmp == null) continue;
-                BuffStack.stackEffect(tmp, (LivingEntity) Bukkit.getEntity(uuid));
-            }
+//            for (UUID uuid : EntityInf.entityStack.keySet()) {
+//                Map<BuffStack.StackType, Integer> tmp = EntityInf.entityStack.get(uuid);
+//                if (tmp == null) continue;
+//                BuffStack.stackEffect(tmp, (LivingEntity) Bukkit.getEntity(uuid));
+//            }
         }
     };
 }

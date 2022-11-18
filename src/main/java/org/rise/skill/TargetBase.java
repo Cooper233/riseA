@@ -41,6 +41,13 @@ public class TargetBase {
         type = ty;
     }
 
+    /***
+     * 只读入黑名单
+     * @param ty
+     * @param l
+     * @param n
+     * @param bl 黑名单
+     */
     public TargetBase(Type ty, double l, int n, List<NpcType> bl) {
         type = ty;
         length = l;
@@ -48,6 +55,14 @@ public class TargetBase {
         blackList = bl;
     }
 
+    /***
+     * 读入白名单和黑名单
+     * @param ty
+     * @param l
+     * @param n
+     * @param bl 黑名单
+     * @param wl 白名单
+     */
     public TargetBase(Type ty, double l, int n, List<NpcType> bl, List<NpcType> wl) {
         type = ty;
         length = l;

@@ -20,7 +20,10 @@ import org.rise.team.TeamBase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class riseAPI implements Listener {
 
@@ -41,7 +44,10 @@ public class riseAPI implements Listener {
     }
 
     public static void resetPlayerAttr(Player player) {
-        RAState state = new RAState();
+        RAState state;
+        if (EntityInf.playersAttr.containsKey(player.getUniqueId()))
+            state = EntityInf.playersAttr.get(player.getUniqueId());
+        else state = new RAState();
         state.setDefault();
         state.initAll(player);
         EntityInf.playersAttr.put(player.getUniqueId(), state.analyze(1, player));
@@ -53,68 +59,45 @@ public class riseAPI implements Listener {
             state = EntityInf.playersAttr.get(player.getUniqueId());
         else state = new RAState();
         if (alldefault) state.AllDefault();
-        state.setDefault();
+        else state.setDefault();
         state.initAll(player);
         EntityInf.playersAttr.put(player.getUniqueId(), state.analyze(1, player));
     }
 
     public static void addAttrMod(LivingEntity entity, AttrModifier modifier) {
         if (entity.isDead()) return;
-        if (entity instanceof Player) {
-            RAState tmp = EntityInf.getPlayerState(entity.getUniqueId());
-            assert tmp != null;
-            tmp.addAttrModifier(modifier);
-            EntityInf.playersAttr.put(entity.getUniqueId(), tmp);
-        } else {
-            List<AttrModifier> tmp = null;
-            if (EntityInf.entityModifier.containsKey(entity.getUniqueId()))
-                tmp = EntityInf.entityModifier.get(entity.getUniqueId());
-            if (tmp == null) tmp = new LinkedList<>();
-            int l = 0, r = tmp.size() - 1, ans = -1;
-            while (l <= r) {
-                int mid = ((l + r) >> 1);
-                if (tmp.get(mid).disappear < modifier.disappear) {
-                    ans = mid;
-                    l = mid + 1;
-                } else r = mid - 1;
-            }
-            tmp.add(ans + 1, modifier);
-            EntityInf.entityModifier.put(entity.getUniqueId(), tmp);
+        List<AttrModifier> tmp = EntityInf.getEntityModifier(entity);
+        int l = 0, r = tmp.size() - 1, ans = -1;
+        while (l <= r) {
+            int mid = ((l + r) >> 1);
+            if (tmp.get(mid).disappear < modifier.disappear) {
+                ans = mid;
+                l = mid + 1;
+            } else r = mid - 1;
         }
+        tmp.add(ans + 1, modifier);
+        EntityInf.setEntityModifier(entity, tmp);
     }
 
     public static void addExHp(Player player, double hp, long length)//length以毫秒为单位
     {
-        RAState state = EntityInf.getPlayerState(player);
-        state.addExHp(new ExtraHp(hp, length));
-        EntityInf.playersAttr.put(player.getUniqueId(), state);
+        List<ExtraHp> list = EntityInf.getEntityExtraHp(player);
+        ExtraHp.addExHp(list, new ExtraHp(hp, length), player);
     }
 
     public static void addBuffStack(LivingEntity entity, BuffStack.StackType tar, int val) {
-        if (entity instanceof Player) {
-            RAState state = EntityInf.getPlayerState((Player) entity);
-            int bef = state.getStackNum(tar);
-            state.addBuffStack(tar, val);
-            int aft = state.getStackNum(tar);
-            EntityInf.playersAttr.put(entity.getUniqueId(), state);
-            switch (tar) {
-                case RISK: {
-                    if (aft > bef) {
-                        addExHp((Player) entity, 30, 40000);
-                    }
-                    break;
+        Map<BuffStack.StackType, Integer> map = EntityInf.getEntityStack(entity);
+        int bef = BuffStack.getStackNum(map, tar);
+        BuffStack.addBuffStack(map, tar, val, EntityInf.getEntityState(entity).analyze(2, entity));
+        int aft = BuffStack.getStackNum(map, tar);
+        EntityInf.setEntityStack(entity, map);
+        switch (tar) {
+            case RISK: {
+                if (aft > bef) {
+                    addExHp((Player) entity, 30, 40000);
                 }
+                break;
             }
-        } else {
-            Map<BuffStack.StackType, Integer> buffStack = new HashMap<>();
-            if (EntityInf.entityStack.containsKey(entity.getUniqueId())) {
-                buffStack = EntityInf.entityStack.get(entity.getUniqueId());
-            }
-            RAState s = new RAState();
-            s.AllDefault();
-            s.buffStack = buffStack;
-            s.addBuffStack(tar, val);
-            EntityInf.entityStack.put(entity.getUniqueId(), s.buffStack);
         }
     }
 
@@ -223,12 +206,12 @@ public class riseAPI implements Listener {
             }
         }
         if (entity instanceof Player && player != null) {
-            if (entity.getWorld().getName().startsWith("pvp")) {
-                if (TeamBase.getNowTeam(player) == TeamBase.getNowTeam((Player) entity)) {
+            if (entity.getWorld().getName().toLowerCase().startsWith("pvp")) {
+                if (TeamBase.getNowTeam(player) != null && TeamBase.getNowTeam(player) == TeamBase.getNowTeam((Player) entity)) {
                     types.add(NpcType.PLAYER);
                 } else types.add(NpcType.PLAYER_ENEMY);
             } else types.add(NpcType.PLAYER);
-        } else types.add(NpcType.PLAYER);
+        } else if (entity instanceof Player) types.add(NpcType.PLAYER);
         boolean ifElc = false;
         for (String i : riseA.npcElc) {
             if (entity.getCustomName() != null && entity.getCustomName().contains(i)) {

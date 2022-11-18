@@ -36,6 +36,16 @@ public class RAState implements Cloneable {
     public boolean applied = false;
     public boolean nonHeadshot = false;
 
+    public RAState() {
+        floatingLore = new LinkedList<>();
+        staticLore = new LinkedList<>();
+        attrMap = new HashMap<>();
+        potions = new HashMap<>();
+        suit = new HashMap<>();
+        type = new HashMap<>();
+        activeTalent = new LinkedList<>();
+        applied = false;
+    }
 
     @Override
     public RAState clone() {
@@ -45,18 +55,14 @@ public class RAState implements Cloneable {
             clone.attrMap.put(i, attrMap.get(i));
         }
         clone.downed = downed;
-        clone.floatingLore = new LinkedList<>(floatingLore);
-        clone.staticLore = new LinkedList<>(staticLore);
+        clone.floatingLore.addAll(floatingLore);
+        clone.staticLore.addAll(staticLore);
         for (PotionEffectType i : potions.keySet())
             clone.potions.put(i, potions.get(i));
         for (String i : suit.keySet())
             clone.suit.put(i, suit.get(i));
         for (String i : type.keySet())
             clone.type.put(i, type.get(i));
-        clone.exhp = new LinkedList<>(exhp);
-        for (BuffStack.StackType i : buffStack.keySet())
-            clone.buffStack.put(i, buffStack.get(i));
-        clone.attrMod = new LinkedList<>(attrMod);
         clone.activeTalent = new LinkedList<>(activeTalent);
         clone.applied = applied;
         return clone;
@@ -103,11 +109,7 @@ public class RAState implements Cloneable {
     public Map<PotionEffectType, Integer> potions = new HashMap<>();
     public Map<String, Integer> suit = new HashMap<>();
     public Map<String, Boolean> type = new HashMap<>();
-    public Map<BuffStack.StackType, Integer> buffStack = new HashMap<>();
-    public Map<BuffStack.StackType, Long> lastBuffReduce = new HashMap<>();
-    public List<ExtraHp> exhp = new LinkedList<>();
-    public double totalExHp = 0;
-    public List<AttrModifier> attrMod = new LinkedList<>();
+    //TODO: 把叠层，buff，属性修改器等非解析元素移动到EntityInf里，作为单独的数据项，不随RAState改动
     public List<TalentType> activeTalent = new LinkedList<>();
 
     public void AllDefault() {
@@ -139,14 +141,11 @@ public class RAState implements Cloneable {
         setAttr(RECOVER_EFFECT, 0);
         setAttr(SKILL_ACCELERATE, 0);
         setAttr(PULSE_RESISTANCE, 0);
-        staticLore.clear();
-        floatingLore.clear();
+//        staticLore.clear();
+//        floatingLore.clear();
         potions.clear();
         suit.clear();
         type.clear();
-        exhp.clear();
-        buffStack.clear();
-        attrMod.clear();
         activeTalent.clear();
         applied = false;
     }
@@ -196,93 +195,11 @@ public class RAState implements Cloneable {
         }
     }
 
-    public void overdueCheck() {
-        while (!exhp.isEmpty() && exhp.get(0).disappear <= System.currentTimeMillis()) {
-            totalExHp -= exhp.get(0).left;
-            exhp.remove(0);
-        }
-        while (!attrMod.isEmpty() && attrMod.get(0).disappear <= System.currentTimeMillis()) {
-            attrMod.remove(0);
-        }
-    }
+
 
     public void secondlyCheck() {
-        overdueCheck();
-        BuffStack.stackCheck(buffStack, this);
     }
 
-    public double getTotalExHp() {
-        return totalExHp;
-    }
-
-    public void addExHp(ExtraHp ex) {
-        ex.left = Math.min(ex.left, riseA.extraHpMax - totalExHp);
-        if (ex.left <= 0) return;
-        boolean done = false;
-        for (int i = 0; i < exhp.size(); i++) {
-            if (exhp.get(i).disappear < ex.disappear) {
-                done = true;
-                exhp.add(i + 1, ex);
-                break;
-            }
-        }
-        if (!done) exhp.add(ex);
-        totalExHp += ex.left;
-    }
-
-    public void addBuffStack(BuffStack.StackType tar, int val) {
-        int _max = BuffStack.getMaxStack(tar, this);
-        int a;
-        if (buffStack.containsKey(tar)) {
-            a = buffStack.get(tar);
-            a += val;
-
-        } else {
-            a = val;
-        }
-        a = Math.max(0, a);
-        a = Math.min(_max, a);
-        if (a != 0)
-            buffStack.put(tar, a);
-        else buffStack.remove(tar);
-    }
-
-    public int getStackNum(BuffStack.StackType tar) {
-        if (!buffStack.containsKey(tar)) return 0;
-        return buffStack.get(tar);
-    }
-
-    public void addAttrModifier(AttrModifier val) {
-        int l = 0, r = attrMod.size() - 1, ans = -1;
-        while (l <= r) {
-            int mid = ((l + r) >> 1);
-            if (attrMod.get(mid).disappear < val.disappear) {
-                ans = mid;
-                l = mid + 1;
-            } else r = mid - 1;
-        }
-        attrMod.add(ans + 1, val);
-    }
-
-    public double resistDamage(double damage)//返回伤害的剩余值
-    {
-        while (!exhp.isEmpty()) {
-            ExtraHp tmp = exhp.get(0);
-            if (tmp.left > damage) {
-                tmp.left -= damage;
-                totalExHp -= damage;
-                exhp.remove(0);
-                exhp.add(0, tmp);
-                damage = 0;
-                break;
-            } else {
-                damage -= tmp.left;
-                totalExHp -= tmp.left;
-                exhp.remove(0);
-            }
-        }
-        return damage;
-    }
 
     public void safeCheck() {
         checkAttrMin(CRIT, 0);
@@ -347,6 +264,8 @@ public class RAState implements Cloneable {
      * @param entity 读取装备的实体
      */
     public void initAll(LivingEntity entity) {
+        staticLore.clear();
+        floatingLore.clear();
         Player tmp = Bukkit.getPlayer("Tech635");
         boolean done = false;
         EntityEquipment a = entity.getEquipment();
@@ -400,7 +319,7 @@ public class RAState implements Cloneable {
             if (check(inv.getItem(11))) staticLore.addAll(inv.getItem(11).getItemMeta().getLore());
             if (check(inv.getItem(12))) staticLore.addAll(inv.getItem(12).getItemMeta().getLore());
             if (check(inv.getItem(13))) staticLore.addAll(inv.getItem(13).getItemMeta().getLore());
-            for (int i = 1; i <= 6; i++) {
+            for (int i = 0; i < 6; i++) {
                 if (check(inv.getItem(26 + i))) staticLore.addAll(inv.getItem(26 + i).getItemMeta().getLore());
             }
             net.minecraft.server.v1_12_R1.Entity iplayer;
@@ -437,6 +356,7 @@ public class RAState implements Cloneable {
      * @param entity 读取装备的实体
      */
     public void init(LivingEntity entity) {
+        floatingLore.clear();
         Player tmp = Bukkit.getPlayer("Tech635");
         boolean done = false;
         EntityEquipment a = entity.getEquipment();
@@ -476,15 +396,12 @@ public class RAState implements Cloneable {
 
     public RAState applyModifier(LivingEntity entity)//获取应用所有增益后的数值
     {
-        overdueCheck();
+        List<AttrModifier> attrMod = EntityInf.getEntityModifier(entity);
+        Map<BuffStack.StackType, Integer> buffStack = EntityInf.getEntityStack(entity);
+        AttrModifier.overdueCheck(attrMod);
         if (applied) return this;
         RAState res = this.clone();
-        if (!(entity instanceof Player) && EntityInf.entityModifier.containsKey(entity.getUniqueId()))
-            this.attrMod = EntityInf.entityModifier.get(entity.getUniqueId());
-        if (!(entity instanceof Player) && EntityInf.entityStack.containsKey(entity.getUniqueId()))
-            this.buffStack = EntityInf.entityStack.get(entity.getUniqueId());
         Collection<PotionEffect> pe = entity.getActivePotionEffects();
-        if (attrMod == null) attrMod = new LinkedList<>();
 
         //以下是加算
         for (AttrModifier i : attrMod) {
@@ -630,7 +547,8 @@ public class RAState implements Cloneable {
         }
         res.safeCheck();
         res.maxCheck();
-        return res;
+        res.applied = true;
+        return res.clone();
     }
 
     /***
@@ -643,9 +561,9 @@ public class RAState implements Cloneable {
         List<String> target = new LinkedList<>();
         List<String> newLores = new LinkedList<>();
         RAState state = this.clone();
-        if (level == 1) target = new LinkedList<>(this.staticLore);
-        if (level == 1) AllDefault();
-        if (level == 2) target = new LinkedList<>(this.floatingLore);
+        if (level == 1) target.addAll(this.staticLore);
+        if (level == 1) setDefault();
+        if (level == 2) target.addAll(this.floatingLore);
         for (int s = 0; s < target.size(); s++) {
             String tmp = target.get(s);
             if (tmp.contains(riseA.suitMarkS)) {
@@ -760,13 +678,17 @@ public class RAState implements Cloneable {
                 String s = riseA.attrName.get(i);
                 if (s == null) tp.sendRawMessage("" + i);
                 if (tmp.contains(s)) {
-                    addAttr(i, res);
+//                    if(level==2){
+//                        tp.sendMessage(""+s+" "+res);
+//                    }
+                    state.addAttr(i, res);
                 }
             }
         }
+//        if(level==2)tp.sendMessage("a:"+state.getAttr(DAMAGE));
         state.safeCheck();
         state.maxCheck();
-        return state;
+        return state.clone();
     }
 
     public String getAttrDes(Attr type) {

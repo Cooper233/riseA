@@ -14,8 +14,8 @@ trueDamage: 真实伤害
 trueDamageMax: 5000
 hp: 生命值
 percentHp: 总生命值
-HpRegen: 生命值恢复
-HpRegenMax: 80
+hpRegen: 生命值恢复
+hpRegenMax: 80
 physicalResistance: 物理抗性
 physicalMax: 1000
 physicalPiercing: 物理穿透

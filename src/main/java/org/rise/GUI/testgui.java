@@ -226,13 +226,13 @@ public class testgui implements Listener {
         VexText level2 = new VexText(-299 - (ll.length() * 2 - 1) * 2, -177, Arrays.asList("§7§l§f" + ll), 1.5);
         VexPlayerDraw playerDraw = new VexPlayerDraw(-180, 35, 80, player);
         PlayerInventory inv = player.getInventory();
-        VexSlot slot1 = new VexSlot(101, 18, -156, ModuleGui.getItem(player, 27));
-        VexSlot slot2 = new VexSlot(102, 18, -106, ModuleGui.getItem(player, 28));
-        VexSlot slot3 = new VexSlot(103, 18, -56, ModuleGui.getItem(player, 29));
+        VexSlot slot1 = new VexSlot(101, 18, -156, ModuleGui.getItem(player, 26));
+        VexSlot slot2 = new VexSlot(102, 18, -106, ModuleGui.getItem(player, 27));
+        VexSlot slot3 = new VexSlot(103, 18, -56, ModuleGui.getItem(player, 28));
         ItemStack[] tar = getMWFSlot(player);
-        VexSlot slot4 = new VexSlot(104, 101, -156, ModuleGui.getItem(player, 30));
-        VexSlot slot5 = new VexSlot(105, 101, -106, ModuleGui.getItem(player, 31));
-        VexSlot slot6 = new VexSlot(106, 101, -56, ModuleGui.getItem(player, 32));
+        VexSlot slot4 = new VexSlot(104, 101, -156, ModuleGui.getItem(player, 29));
+        VexSlot slot5 = new VexSlot(105, 101, -106, ModuleGui.getItem(player, 30));
+        VexSlot slot6 = new VexSlot(106, 101, -56, ModuleGui.getItem(player, 31));
         VexClickableButton button_item = new VexClickableButton("button_item", "", "[local]ISAC/button-item.png", "[local]ISAC/button-item_.png", "[local]ISAC/button-item_.png", 35, -225, 50, 50, false);
         VexClickableButton button_skill = new VexClickableButton("button_skill", "", "[local]ISAC/button-skill.png", "[local]ISAC/button-skill_.png", "[local]ISAC/button-skill_.png", 85, -225, 50, 50, true);
         VexClickableButton button_state = new VexClickableButton("button_state", "", "[local]ISAC/button-state.png", "[local]ISAC/button-state_.png", "[local]ISAC/button-state_.png", 135, -225, 50, 50, true);
@@ -397,7 +397,7 @@ public class testgui implements Listener {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            RAState state = EntityInf.getPlayerState(player1);
+            RAState state = EntityInf.getPlayerState(player1).analyze(2, player1);
             state = state.applyModifier(player1);
             VexScrollingList list = new VexScrollingList(-20, -180, 216, 180, 1000);
             VexSplitImage back3 = new VexSplitImage("[local]ISAC/inv-back-1.png", -45, -200, 0, 0, 256, 200, 256, 190, 256, 256);
@@ -407,36 +407,37 @@ public class testgui implements Listener {
             ConfigurationSection config = riseA.config;
             config = config.getConfigurationSection("description");
             addTextComponent(list, "§6§l|||§7§l| §f作战效能： §e" + state.getEffectiveness(), new LinkedList<>());
-            for (Attr attr : riseA.attrName.keySet()) {
-                addTextComponent(list, state.getAttrDes(attr), config.getStringList(attr.name()));
-            }
-//            addTextComponent(list, state.getAttrDes(Attr.CRIT), config.getStringList("CRIT"));
-//            addTextComponent(list, state.getAttrDes(Attr.CRIT_RATE), config.getStringList("CRIT_RATE"));
-//            addTextComponent(list, state.getAttrDes(Attr.HEADSHOT_RATE), config.getStringList("HEADSHOT_RATE"));
-//            addTextComponent(list, state.getAttrDes(Attr.DAMAGE), config.getStringList("DAMAGE"));
-//            addTextComponent(list, state.getAttrDes(Attr.FINAL_DAMAGE), config.getStringList("FINAL_DAMAGE"));
-//            addTextComponent(list, state.getAttrDes(Attr.TRUE_DAMAGE), config.getStringList("TRUE_DAMAGE"));
-//            addTextComponent(list, state.getAttrDes(Attr.HP), config.getStringList("HP"));
-//            addTextComponent(list, state.getAttrDes(Attr.HP_REGEN), config.getStringList("HP_REGEN"));
-//            addTextComponent(list, state.getAttrDes(Attr.PERCENT_HP), config.getStringList("PERCENT_HP"));
-//            addTextComponent(list, state.getAttrDes(Attr.PHYSICAL_RESISTANCE), config.getStringList("PHYSICAL_RESISTANCE"));
-//            addTextComponent(list, state.getAttrDes(Attr.SPECIAL_RESISTANCE), config.getStringList("SPECIAL_RESISTANCE"));
-//            addTextComponent(list, state.getAttrDes(Attr.PHYSICAL_PIERCING), config.getStringList("PHYSICAL_PIERCING"));
-//            addTextComponent(list, state.getAttrDes(Attr.SPEED), config.getStringList("SPEED"));
-//            addTextComponent(list, state.getAttrDes(Attr.PERCENT_DAMAGE), config.getStringList("PERCENT_DAMAGE"));
-//            addTextComponent(list, state.getAttrDes(Attr.HIT), config.getStringList("HIT"));
-//            addTextComponent(list, state.getAttrDes(Attr.AVOID), config.getStringList("AVOID"));
-//            addTextComponent(list, state.getAttrDes(Attr.EXP_BOUNCE), config.getStringList("EXP_BOUNCE"));
-//            addTextComponent(list, state.getAttrDes(Attr.ON_KILL_REGEN), config.getStringList("ON_KILL_REGEN"));
-//            addTextComponent(list, state.getAttrDes(Attr.NF_ABILITY), config.getStringList("NF_ABILITY"));
-//            addTextComponent(list, state.getAttrDes(Attr.DEBUFF_RESISTANCE), config.getStringList("DEBUFF_RESISTANCE"));
-//            addTextComponent(list, state.getAttrDes(Attr.DAMAGE_RECEIVE), config.getStringList("DAMAGE_RECEIVE"));
-//            addTextComponent(list, state.getAttrDes(Attr.SKILL_LEVEL), config.getStringList("SKILL_LEVEL"));
-//            addTextComponent(list, state.getAttrDes(Attr.SKILL_DAMAGE), config.getStringList("SKILL_DAMAGE"));
-//            addTextComponent(list, state.getAttrDes(Attr.DEBUFF_EFFECT), config.getStringList("DEBUFF_EFFECT"));
-//            addTextComponent(list, state.getAttrDes(Attr.RECOVER_EFFECT), config.getStringList("RECOVER_EFFECT"));
-//            addTextComponent(list, state.getAttrDes(Attr.SKILL_ACCELERATE), config.getStringList("SKILL_ACCELERATE"));
-//            addTextComponent(list, state.getAttrDes(Attr.PULSE_RESISTANCE), config.getStringList("PULSE_RESISTANCE"));
+            //TODO: 给keySet写个排序
+//            for (Attr attr : riseA.attrName.keySet()) {
+//                addTextComponent(list, state.getAttrDes(attr), config.getStringList(attr.name()));
+//            }
+            addTextComponent(list, state.getAttrDes(Attr.CRIT), config.getStringList("CRIT"));
+            addTextComponent(list, state.getAttrDes(Attr.CRIT_RATE), config.getStringList("CRIT_RATE"));
+            addTextComponent(list, state.getAttrDes(Attr.HEADSHOT_RATE), config.getStringList("HEADSHOT_RATE"));
+            addTextComponent(list, state.getAttrDes(Attr.DAMAGE), config.getStringList("DAMAGE"));
+            addTextComponent(list, state.getAttrDes(Attr.FINAL_DAMAGE), config.getStringList("FINAL_DAMAGE"));
+            addTextComponent(list, state.getAttrDes(Attr.TRUE_DAMAGE), config.getStringList("TRUE_DAMAGE"));
+            addTextComponent(list, state.getAttrDes(Attr.HP), config.getStringList("HP"));
+            addTextComponent(list, state.getAttrDes(Attr.HP_REGEN), config.getStringList("HP_REGEN"));
+            addTextComponent(list, state.getAttrDes(Attr.PERCENT_HP), config.getStringList("PERCENT_HP"));
+            addTextComponent(list, state.getAttrDes(Attr.PHYSICAL_RESISTANCE), config.getStringList("PHYSICAL_RESISTANCE"));
+            addTextComponent(list, state.getAttrDes(Attr.SPECIAL_RESISTANCE), config.getStringList("SPECIAL_RESISTANCE"));
+            addTextComponent(list, state.getAttrDes(Attr.PHYSICAL_PIERCING), config.getStringList("PHYSICAL_PIERCING"));
+            addTextComponent(list, state.getAttrDes(Attr.SPEED), config.getStringList("SPEED"));
+            addTextComponent(list, state.getAttrDes(Attr.PERCENT_DAMAGE), config.getStringList("PERCENT_DAMAGE"));
+            addTextComponent(list, state.getAttrDes(Attr.HIT), config.getStringList("HIT"));
+            addTextComponent(list, state.getAttrDes(Attr.AVOID), config.getStringList("AVOID"));
+            addTextComponent(list, state.getAttrDes(Attr.EXP_BOUNCE), config.getStringList("EXP_BOUNCE"));
+            addTextComponent(list, state.getAttrDes(Attr.ON_KILL_REGEN), config.getStringList("ON_KILL_REGEN"));
+            addTextComponent(list, state.getAttrDes(Attr.NF_ABILITY), config.getStringList("NF_ABILITY"));
+            addTextComponent(list, state.getAttrDes(Attr.DEBUFF_RESISTANCE), config.getStringList("DEBUFF_RESISTANCE"));
+            addTextComponent(list, state.getAttrDes(Attr.DAMAGE_RECEIVE), config.getStringList("DAMAGE_RECEIVE"));
+            addTextComponent(list, state.getAttrDes(Attr.SKILL_LEVEL), config.getStringList("SKILL_LEVEL"));
+            addTextComponent(list, state.getAttrDes(Attr.SKILL_DAMAGE), config.getStringList("SKILL_DAMAGE"));
+            addTextComponent(list, state.getAttrDes(Attr.DEBUFF_EFFECT), config.getStringList("DEBUFF_EFFECT"));
+            addTextComponent(list, state.getAttrDes(Attr.RECOVER_EFFECT), config.getStringList("RECOVER_EFFECT"));
+            addTextComponent(list, state.getAttrDes(Attr.SKILL_ACCELERATE), config.getStringList("SKILL_ACCELERATE"));
+            addTextComponent(list, state.getAttrDes(Attr.PULSE_RESISTANCE), config.getStringList("PULSE_RESISTANCE"));
             addTextComponent(list, "§6§l|||§7§l| §f已启用的天赋:", Arrays.asList("§f被动/主动"));
             for (TalentType j : state.activeTalent) {
                 addTextComponent(list, "§6[§f§l" + riseA.talentMapReflect.get(j) + "§6]", TalentRefit.talentDescription.get(j));

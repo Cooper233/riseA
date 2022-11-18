@@ -82,6 +82,7 @@ public class PerformSkill implements Runnable {
                             //npc标签有黑名单中的就不打
                             //优先级相同
                             //白名单可为空，表示任何都打
+//                            tp.sendMessage(j.getName()+" "+et.toString());
                             if (!i.target.whitelist.isEmpty()) {
                                 boolean ss = false;
                                 for (NpcType s : et) {
@@ -130,7 +131,7 @@ public class PerformSkill implements Runnable {
                     if (entity instanceof Player) {
                         state = EntityInf.getPlayerState((Player) entity);
                         state.init(entity);
-                        state = state.analyze(2, entity);
+                        state = state.analyze(2, entity).applyModifier(entity);
                     } else {
                         state.initAll(entity);
                         state = state.analyze(1, entity).analyze(2, entity).applyModifier(entity);
@@ -239,6 +240,7 @@ public class PerformSkill implements Runnable {
                         EffectStack e = (EffectStack) i;
                         for (LivingEntity j : target) {
                             if (j.isDead()) continue;
+//                            tp.sendMessage(j.toString());
                             riseAPI.addBuffStack(j, e.id, e.val);
                         }
                         break;

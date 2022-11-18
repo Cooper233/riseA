@@ -1,14 +1,11 @@
 package org.rise.State;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
 import org.rise.talent.TalentType;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +65,29 @@ public class BuffStack {
         }
     }
 
-    public static void stackCheck(Map<StackType, Integer> map, RAState state) {
+    public static void addBuffStack(Map<StackType, Integer> buffStack, BuffStack.StackType tar, int val, RAState state) {
+        int _max = BuffStack.getMaxStack(tar, state);
+        int a;
+        if (buffStack.containsKey(tar)) {
+            a = buffStack.get(tar);
+            a += val;
+
+        } else {
+            a = val;
+        }
+        a = Math.max(0, a);
+        a = Math.min(_max, a);
+        if (a != 0)
+            buffStack.put(tar, a);
+        else buffStack.remove(tar);
+    }
+
+    public static int getStackNum(Map<StackType, Integer> buffStack, BuffStack.StackType tar) {
+        if (!buffStack.containsKey(tar)) return 0;
+        return buffStack.get(tar);
+    }
+
+    public static void stackCheck(Map<StackType, Integer> map, Map<StackType, Long> lastBuffReduce, RAState state) {
         Player tp = Bukkit.getPlayer("Tech635");
         if (map == null || map.isEmpty()) return;
         List<BuffStack.StackType> list = new LinkedList<>(map.keySet());
@@ -111,10 +130,11 @@ public class BuffStack {
                 }
             }
             if (len == -1) continue;
-            if (!state.lastBuffReduce.containsKey(i)) state.lastBuffReduce.put(i, System.currentTimeMillis());
-            if (System.currentTimeMillis() - state.lastBuffReduce.get(i) > len) {
-                state.lastBuffReduce.put(i, System.currentTimeMillis());
-                state.addBuffStack(i, -red);
+            if (lastBuffReduce == null) lastBuffReduce = new HashMap<>();
+            if (!lastBuffReduce.containsKey(i)) lastBuffReduce.put(i, System.currentTimeMillis());
+            if (System.currentTimeMillis() - lastBuffReduce.get(i) > len) {
+                lastBuffReduce.put(i, System.currentTimeMillis());
+                addBuffStack(map, i, -red, state);
             }
         }
     }
@@ -125,12 +145,12 @@ public class BuffStack {
             if (map.get(i) > 0) {
                 switch (i) {
                     case PULSE_AFFECT: {
-                        World world = entity.getWorld();
-                        MaterialData data = new MaterialData(Material.STAINED_GLASS);
-                        data.setData((byte) 1);
-                        for (int j = 1; j <= 10; j++) {
-                            world.spawnParticle(Particle.FALLING_DUST, entity.getEyeLocation().add(0, 0.5, 0), 0, 0, 1, 0, 2, data);
-                        }
+//                        World world = entity.getWorld();
+//                        MaterialData data = new MaterialData(Material.STAINED_GLASS);
+//                        data.setData((byte) 1);
+//                        for (int j = 1; j <= 10; j++) {
+//                            world.spawnParticle(Particle.FALLING_DUST, entity.getEyeLocation().add(0, 0.5, 0), 0, 0, 1, 0, 2, data);
+//                        }
                         break;
                     }
                 }
