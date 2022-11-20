@@ -78,7 +78,8 @@ public class EntityInf {
     }
 
     public static Map<BuffStack.StackType, Long> getEntityLastStackReduce(Entity entity) {
-        if (entityStack.containsKey(entity.getUniqueId())) return entityLastStackReduce.get(entity.getUniqueId());
+        if (entityLastStackReduce.containsKey(entity.getUniqueId()))
+            return entityLastStackReduce.get(entity.getUniqueId());
         return new HashMap<>();
     }
 
@@ -88,7 +89,8 @@ public class EntityInf {
     }
 
     public static List<AttrModifier> getEntityModifier(Entity entity) {
-        if (entityStack.containsKey(entity.getUniqueId()) && entityModifier.get(entity.getUniqueId()) != null)
+        if (entity == null) return new LinkedList<>();
+        if (entityModifier.containsKey(entity.getUniqueId()) && entityModifier.get(entity.getUniqueId()) != null)
             return new LinkedList<>(entityModifier.get(entity.getUniqueId()));
         return new LinkedList<>();
     }

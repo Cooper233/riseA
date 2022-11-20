@@ -1,14 +1,12 @@
 package org.rise.handler;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -19,6 +17,7 @@ import org.rise.Inventory.ModuleGui;
 import org.rise.State.AttrModifier;
 import org.rise.State.BuffStack;
 import org.rise.State.RAState;
+import org.rise.activeSkills.ConstantEffect;
 import org.rise.effect.CustomEffectBase;
 import org.rise.riseA;
 import org.rise.riseAPI;
@@ -177,6 +176,7 @@ public class EntityUpdate {
         public void run() {
             for (UUID uuid : EntityInf.entityModifier.keySet()) {
                 LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+                if (entity == null) continue;
                 List<AttrModifier> tmp = EntityInf.getEntityModifier(entity);
                 while (!tmp.isEmpty() && tmp.get(0).disappear <= System.currentTimeMillis()) {
                     tmp.remove(0);
@@ -193,13 +193,35 @@ public class EntityUpdate {
             }
             for (UUID uuid : EntityInf.entityStack.keySet()) {
                 LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+                if (entity == null) continue;
                 Map<BuffStack.StackType, Integer> tmp = EntityInf.getEntityStack(entity);
                 RAState state = EntityInf.getEntityState(entity);
                 Map<BuffStack.StackType, Long> lastBuffReduce = EntityInf.getEntityLastStackReduce(entity);
                 BuffStack.stackCheck(tmp, lastBuffReduce, state);
                 EntityInf.setEntityStack(entity, tmp);
-                BuffStack.stackEffect(tmp, (LivingEntity) Bukkit.getEntity(uuid));
+                BuffStack.stackEffect(tmp, entity);
                 EntityInf.setEntityLastStackReduce(entity, lastBuffReduce);
+            }
+        }
+    };
+    public static Runnable WrongEntityRemove = new Runnable() {
+        @Override
+        public void run() {
+            for (World world : Bukkit.getWorlds()) {
+                for (Entity i : world.getEntities()) {
+                    if (i instanceof Zombie && ((Zombie) i).isBaby() && i.isSilent()) {
+                        boolean find = false;
+                        for (UUID id : ConstantEffect.platformId.keySet()) {
+                            if (ConstantEffect.platformId.get(id) == i.getUniqueId()) {
+                                find = true;
+                                break;
+                            }
+                        }
+                        if (!find) {
+                            i.remove();
+                        }
+                    }
+                }
             }
         }
     };
@@ -207,9 +229,11 @@ public class EntityUpdate {
         @Override
         public void run() {
             for (UUID uuid : EntityInf.entityEffect.keySet()) {
+                LivingEntity entity = (LivingEntity) Bukkit.getEntity(uuid);
+                if (entity == null) continue;
                 List<CustomEffectBase> tmp = EntityInf.entityEffect.get(uuid);
                 for (CustomEffectBase base : tmp) {
-                    CustomEffectBase.secondlyCheck((LivingEntity) Bukkit.getEntity(uuid), base);
+                    CustomEffectBase.secondlyCheck(entity, base);
                 }
             }
 //            for (UUID uuid : EntityInf.entityStack.keySet()) {

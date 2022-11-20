@@ -5,6 +5,7 @@ import org.rise.State.Attr;
 import org.rise.extra.Pair;
 import org.rise.riseA;
 import org.rise.talent.TalentType;
+import org.rise.utils.GetNumUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -55,11 +56,8 @@ public class CalibrationItem {
                     talent = riseA.talentMap.get(s1);
                 }
             } else if (s.contains(riseA.levelMarkS)) {
-                if (s.contains("I")) level = 1;
-                if (s.contains("II")) level = 2;
-                if (s.contains("III")) level = 3;
-                if (s.contains("IV")) level = 4;
-                if (s.contains("V")) level = 5;
+                level = GetNumUtils.getInt(s);
+                level = Math.max(5, level / 100 + 1);
             } else {
                 if (type != null) {
                     for (String na : riseA.refitBaseMap.keySet()) {

@@ -92,7 +92,7 @@ public class ModuleGui implements Listener {
             if (file.contains("Sk2")) {
                 items[24] = file.getItemStack("Sk2", new ItemStack(Material.AIR));
             }
-            for (int i = 1; i <= 6; i++) {
+            for (int i = 0; i < 6; i++) {
                 items[26 + i] = file.getItemStack("Eq" + i, new ItemStack(Material.AIR));
             }
         } catch (Throwable e) {
@@ -132,7 +132,7 @@ public class ModuleGui implements Listener {
         if (sk2 != null && sk2.getType() != Material.AIR) {
             file.set("Sk2", sk2);
         } else file.set("Sk2", null);
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 0; i < 6; i++) {
             if (eq[i] != null && eq[i].getType() != Material.AIR) {
                 file.set("Eq" + i, eq[i]);
             }

@@ -635,8 +635,7 @@ riseA extends JavaPlugin implements Listener {
                 if (Objects.equals(args[0], "cit")) {
                     if (args.length == 2) {
                         org.rise.GUI.calibrationInject.TypeSelectGUI.open(Bukkit.getPlayer(args[1]));
-                    }
-                    org.rise.GUI.calibrationInject.TypeSelectGUI.open((Player) sender);
+                    } else org.rise.GUI.calibrationInject.TypeSelectGUI.open((Player) sender);
                     return true;
                 }
                 if (Objects.equals(args[0], "vt1")) {
@@ -793,6 +792,7 @@ riseA extends JavaPlugin implements Listener {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.EntitySecondlyCheck, 0L, 20L);
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.playerSecondlyCheck, 0L, 60L);
+        scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.WrongEntityRemove, 0L, 100L);
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.playerTicklyCheck, 0L, 1L);
         scheduler.scheduleSyncRepeatingTask(this, EntityUpdate.EntityTicklyCheck, 0, 1L);
         scheduler.scheduleSyncRepeatingTask(this, ConstantEffect.secondlyCheck, 0, 20L);

@@ -18,4 +18,15 @@ public class GetNumUtils {
         if (m.find()) res = Float.parseFloat(m.group());
         return res;
     }
+
+    public static int getInt(String s) {
+        int res = 0;
+        s = s.replaceAll("§[0-9]", "§f");
+        Pattern p = Pattern.compile("[0-9]+");
+        Matcher m = p.matcher(s);
+        if (m.find()) {
+            res = Integer.parseInt(m.group());
+        }
+        return res;
+    }
 }

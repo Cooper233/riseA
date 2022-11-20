@@ -1,12 +1,10 @@
 package org.rise.activeSkills.effect;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.rise.EntityInf;
@@ -51,7 +49,6 @@ public abstract class PlatformBase extends ActiveBase {
             entity.setCustomName(player.getName() + "的支援平台");
             Zombie z = (Zombie) entity;
             EntityEquipment inv = z.getEquipment();
-            inv.setHelmet(new ItemStack(Material.getMaterial("MODULARWARFARE_PROTOTYPEMILITARY_CAP_BLACK")));
             z.setBaby(true);
             z.setSilent(true);
             AttributeInstance instance = z.getAttribute(Attribute.GENERIC_MAX_HEALTH);

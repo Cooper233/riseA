@@ -111,10 +111,10 @@ public class TypeSelectGUI implements Listener {
         ButtonFunction f14 = new ButtonFunction() {
             @Override
             public void run(Player player) {
-                EquipSelectGUI.open(player, "背包");
+                EquipSelectGUI.open(player, "普通装备");
             }
         };
-        VexButton button_normal = new VexButton("tb_normal", "普通装备", "[local]ISAC/test-button.png", "[local]ISAC/test-button_.png", 70, 210, 64, 45, f13);
+        VexButton button_normal = new VexButton("tb_normal", "普通装备", "[local]ISAC/test-button.png", "[local]ISAC/test-button_.png", 170, 210, 64, 45, f14);
         gui.addAllComponents(Arrays.asList(text, button_ar, button_dmr, button_rf, button_sg, button_mg, button_hg, button_smg, button_mask, button_armor, button_holster, button_kneepad, button_extra, button_bag, button_normal));
         VexViewAPI.openGui(player, gui);
     }

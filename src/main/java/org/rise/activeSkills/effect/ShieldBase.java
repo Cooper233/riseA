@@ -90,6 +90,7 @@ public abstract class ShieldBase extends ActiveBase {
         RAState state = EntityInf.getPlayerState(player).analyze(2, player);
         state.applyModifier(player);
         BossBar bar = ConstantEffect.shieldGUI.get(i);
+        if (bar == null) bar = Bukkit.createBossBar("护盾生命值", BarColor.WHITE, BarStyle.SEGMENTED_12);
         List<ActiveBase> list = ConstantEffect.getAffectingSkill(player);
         if (!ConstantEffect.ShieldHealth.containsKey(i)) return;
         double hp = ConstantEffect.ShieldHealth.get(i);

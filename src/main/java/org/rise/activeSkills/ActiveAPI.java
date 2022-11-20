@@ -84,7 +84,7 @@ public class ActiveAPI {
         m8.put(3, new PlatformRevive(3, 9, 600, 8, 30, 45));
         m8.put(4, new PlatformRevive(4, 10, 800, 10, 30, 45));
         m8.put(5, new PlatformRevive(5, 10, 1200, 10, 30, 45));
-        activeMap.put(ActiveType.SHIELD_CRUSADERS, m8);
+        activeMap.put(ActiveType.PLATFORM_REVIVE, m8);
 
         activeSymbol.put("扫描脉冲", ActiveType.PULSE_SCAN);
         activeSymbol.put("支援平台-恢复", ActiveType.PLATFORM_RECOVER);

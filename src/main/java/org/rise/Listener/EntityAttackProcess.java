@@ -597,7 +597,7 @@ public class EntityAttackProcess implements Listener {
         }
         event.setDamage(damage);
         fd = event.getFinalDamage();
-        if (def.getWorld() == att.getWorld() && def instanceof Player && ConstantEffect.usingShield.contains(def.getUniqueId()))//在使用护盾的玩家
+        if (def.getWorld() == att.getWorld() && def instanceof Player && ConstantEffect.usingShield.contains(def.getUniqueId()) && ConstantEffect.constant.containsKey(def.getUniqueId()))//在使用护盾的玩家
         {
             double hp = ConstantEffect.ShieldHealth.get(def.getUniqueId());
             ActiveBase now = null;
@@ -624,9 +624,11 @@ public class EntityAttackProcess implements Listener {
             ((Player) def).playSound(def.getEyeLocation(), "modularwarfare:impact.metal", 16, 1);
             if (hp > 0) {
                 ConstantEffect.ShieldHealth.put(def.getUniqueId(), hp);
-                bar.setProgress(hp / max);
-                if (hp / max <= 0.3) bar.setColor(BarColor.RED);
-                else bar.setColor(BarColor.WHITE);
+                if (bar != null) {
+                    bar.setProgress(hp / max);
+                    if (hp / max <= 0.3) bar.setColor(BarColor.RED);
+                    else bar.setColor(BarColor.WHITE);
+                }
                 ConstantEffect.lastShieldDamaged.put(def.getUniqueId(), System.currentTimeMillis());
             } else {
                 List<ActiveBase> list = ConstantEffect.constant.get(def.getUniqueId());
@@ -634,7 +636,9 @@ public class EntityAttackProcess implements Listener {
                 ConstantEffect.constant.put(def.getUniqueId(), list);
                 ConstantEffect.usingShield.remove(def.getUniqueId());
                 ConstantEffect.ShieldHealth.remove(def.getUniqueId());
-                bar.removePlayer((Player) def);
+                if (bar != null) {
+                    bar.removePlayer((Player) def);
+                }
                 SkillBase skill = new SkillBase("盾牌冷却", cd, "SHIELD", 0, 1, 0, "SHIELD", null, new EnableEffectBase("§f[§6ISAAC§f]§c盾牌遭到损坏！", null, null, "modularwarfare:effect.shield_break"));
                 SkillAPI.performSkill(def, skill, true);
                 PotionEffect p1 = new PotionEffect(PotionEffectType.getById(66), 20, 1);

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.rise.activeSkills.effect.ActiveBase;
+import org.rise.activeSkills.effect.ShieldBase;
 
 import java.util.*;
 
@@ -61,6 +62,20 @@ public class ConstantEffect {
                     base.ticklyCheck(Bukkit.getPlayer(i));
                 }
             }
+            List<UUID> res = new LinkedList<>(usingShield);
+            for (UUID i : usingShield) {
+                if (!constant.containsKey(i)) res.remove(i);
+                List<ActiveBase> list = constant.get(i);
+                boolean find = false;
+                for (ActiveBase base : list) {
+                    if (base instanceof ShieldBase) {
+                        find = true;
+                        break;
+                    }
+                }
+                if (!find) res.remove(i);
+            }
+            usingShield = new LinkedList<>(res);
         }
     };
 
