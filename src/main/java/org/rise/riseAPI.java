@@ -25,10 +25,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/***
+ * 包含了大量常用的方法
+ */
 public class riseAPI implements Listener {
 
 
-
+    /***
+     * 获取物品的标签
+     * @param item
+     * @return
+     */
     public static List<String> getItemType(ItemStack item) {
         if (item == null) return null;
         if (!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
@@ -43,6 +50,10 @@ public class riseAPI implements Listener {
         return res;
     }
 
+    /***
+     * 完全重载玩家的属性
+     * @param player
+     */
     public static void resetPlayerAttr(Player player) {
         RAState state;
         if (EntityInf.playersAttr.containsKey(player.getUniqueId()))
@@ -53,6 +64,11 @@ public class riseAPI implements Listener {
         EntityInf.playersAttr.put(player.getUniqueId(), state.analyze(1, player));
     }
 
+    /***
+     * 与上一个函数相同，当前版本区别仅在于倒地
+     * @param player
+     * @param alldefault
+     */
     public static void resetPlayerAttr(Player player, boolean alldefault) {
         RAState state;
         if (EntityInf.playersAttr.containsKey(player.getUniqueId()))
@@ -64,6 +80,11 @@ public class riseAPI implements Listener {
         EntityInf.playersAttr.put(player.getUniqueId(), state.analyze(1, player));
     }
 
+    /***
+     * 为一个实体增加数值修改器
+     * @param entity
+     * @param modifier
+     */
     public static void addAttrMod(LivingEntity entity, AttrModifier modifier) {
         if (entity.isDead()) return;
         List<AttrModifier> tmp = EntityInf.getEntityModifier(entity);
@@ -79,12 +100,24 @@ public class riseAPI implements Listener {
         EntityInf.setEntityModifier(entity, tmp);
     }
 
-    public static void addExHp(Player player, double hp, long length)//length以毫秒为单位
+    /***
+     *  为一个实体增加额外生命值
+     * @param entity
+     * @param hp
+     * @param length 以毫秒为单位
+     */
+    public static void addExHp(LivingEntity entity, double hp, long length)//
     {
-        List<ExtraHp> list = EntityInf.getEntityExtraHp(player);
-        ExtraHp.addExHp(list, new ExtraHp(hp, length), player);
+        List<ExtraHp> list = EntityInf.getEntityExtraHp(entity);
+        ExtraHp.addExHp(list, new ExtraHp(hp, length), entity);
     }
 
+    /***
+     * 为一个实体增加叠层
+     * @param entity
+     * @param tar
+     * @param val
+     */
     public static void addBuffStack(LivingEntity entity, BuffStack.StackType tar, int val) {
         Map<BuffStack.StackType, Integer> map = EntityInf.getEntityStack(entity);
         int bef = BuffStack.getStackNum(map, tar);
@@ -94,13 +127,17 @@ public class riseAPI implements Listener {
         switch (tar) {
             case RISK: {
                 if (aft > bef) {
-                    addExHp((Player) entity, 30, 40000);
+                    addExHp(entity, 30, 40000);
                 }
                 break;
             }
         }
     }
 
+    /***
+     * 使某个玩家处于倒地状态
+     * @param player
+     */
     public static void setPlayerDowned(Player player) {
         resetPlayerAttr(player, true);
         RAState state = EntityInf.getPlayerState(player);
@@ -108,11 +145,21 @@ public class riseAPI implements Listener {
         EntityInf.playersAttr.put(player.getUniqueId(), state);
     }
 
+    /***
+     * 设置倒地玩家正在被谁扶起
+     * @param player
+     * @param reviver
+     */
     public static void setPlayerReviving(Player player, LivingEntity reviver) {
         EntityInf.revivingMap.put(reviver.getUniqueId(), player.getUniqueId());
         EntityInf.revivingMapReflect.put(player.getUniqueId(), reviver.getUniqueId());
     }
 
+    /***
+     * 推进倒地玩家的扶起进度
+     * @param res
+     * @param reviver
+     */
     public static void pushRevivingProgress(Player res, LivingEntity reviver) {
         if (EntityInf.reviveProgress.containsKey(res.getUniqueId())) {
             int val = EntityInf.reviveProgress.get(res.getUniqueId());
@@ -138,6 +185,11 @@ public class riseAPI implements Listener {
         }
     }
 
+    /***
+     * 设置玩家被扶起
+     * @param player
+     * @param reviver
+     */
     public static void setPlayerRevived(Player player, LivingEntity reviver) {
 
         resetPlayerAttr(player, true);
@@ -161,6 +213,10 @@ public class riseAPI implements Listener {
         EntityInf.revivingMapReflect.remove(player.getUniqueId());
     }
 
+    /***
+     * 同上，但不显示被谁扶起
+     * @param player
+     */
     public static void setPlayerRevived(Player player) {
         resetPlayerAttr(player, true);
         RAState state = EntityInf.getPlayerState(player);
@@ -180,6 +236,12 @@ public class riseAPI implements Listener {
         return getEntityType(null, entity);
     }
 
+    /***
+     * 获取实体的标签
+     * @param player
+     * @param entity
+     * @return
+     */
     public static List<NpcType> getEntityType(Player player, org.bukkit.entity.Entity entity) {
         Player tp = Bukkit.getPlayer("Tech635");
         net.minecraft.server.v1_12_R1.Entity ientity;
@@ -207,7 +269,7 @@ public class riseAPI implements Listener {
         }
         if (entity instanceof Player && player != null) {
             if (entity.getWorld().getName().toLowerCase().startsWith("pvp")) {
-                if (TeamBase.getNowTeam(player) != null && TeamBase.getNowTeam(player) == TeamBase.getNowTeam((Player) entity)) {
+                if (TeamBase.getNowTeam(player) != -1 && TeamBase.getNowTeam(player) == TeamBase.getNowTeam((Player) entity)) {
                     types.add(NpcType.PLAYER);
                 } else types.add(NpcType.PLAYER_ENEMY);
             } else types.add(NpcType.PLAYER);
@@ -223,7 +285,15 @@ public class riseAPI implements Listener {
         return types;
     }
 
-    public static void addEffect(RAState self, LivingEntity tar, CustomEffect type, double modifier, int level, double length) {
+    /***
+     * 为实体增加自定义效果
+     * @param tar
+     * @param type
+     * @param modifier 效果增幅
+     * @param level 效果等级
+     * @param length 持续时间
+     */
+    public static void addEffect(LivingEntity tar, CustomEffect type, double modifier, int level, double length) {
         List<CustomEffectBase> list = EntityInf.entityEffect.get(tar.getUniqueId());
         if (list == null) list = new LinkedList<>();
         for (CustomEffectBase base : list) {
@@ -234,6 +304,12 @@ public class riseAPI implements Listener {
         EntityInf.entityEffect.put(tar.getUniqueId(), list);
     }
 
+    /***
+     * 检查实体是否拥有某效果
+     * @param entity
+     * @param type
+     * @return
+     */
     public static boolean checkEffect(LivingEntity entity, CustomEffect type) {
         List<CustomEffectBase> list = EntityInf.entityEffect.get(entity.getUniqueId());
         if (list == null) return false;
@@ -241,11 +317,5 @@ public class riseAPI implements Listener {
             if (base.type == type && base.start + base.length > System.currentTimeMillis()) return true;
         }
         return false;
-    }
-
-    public static Location getEntityAimingLoc(LivingEntity entity) {
-        Location eye = entity.getEyeLocation();
-//        entity.getLineOfSight()
-        return null;
     }
 }

@@ -99,7 +99,7 @@ public class EntityAttackProcess implements Listener {
             if (!world.getName().toLowerCase().startsWith("pvp")) {
                 event.setCancelled(true);
                 return;
-            } else if (TeamBase.getNowTeam((Player) att) == TeamBase.getNowTeam((Player) def) && TeamBase.getNowTeam((Player) att) != null) {
+            } else if (TeamBase.getNowTeam((Player) att) == TeamBase.getNowTeam((Player) def) && TeamBase.getNowTeam((Player) att) != -1) {
                 event.setCancelled(true);
                 return;
             }
@@ -196,7 +196,7 @@ public class EntityAttackProcess implements Listener {
         }
         if (ifCrit && !ifDodged)
             world.spawnParticle(Particles.getCritParticle(), def.getLocation(), 3);
-        if (damager.getType().name().startsWith("PLAYER")) {
+        if (damager.getType().name().startsWith("PLAYER") && defState.getAttr(NON_HEADSHOT) != 1) {
             Location loc1 = damager.getLocation();
             Vector dir = loc1.getDirection();
             double v1 = Math.sqrt(dir.getX() * dir.getX() + dir.getZ() * dir.getZ());

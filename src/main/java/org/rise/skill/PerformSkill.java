@@ -60,7 +60,7 @@ public class PerformSkill implements Runnable {
                 List<LivingEntity> target = new LinkedList<>();
                 if (i.target.type == TargetBase.Type.SELF && entity != null) target.add(entity);
                 if (i.target.type == TargetBase.Type.TEAM && entity instanceof Player) {
-                    if (TeamBase.getNowTeam((Player) entity) != null) {
+                    if (TeamBase.getNowTeam((Player) entity) != -1) {
                         for (UUID id : TeamBase.teamInfo.get(TeamBase.getNowTeam((Player) entity))) {
                             target.add(Bukkit.getPlayer(id));
                         }
@@ -300,7 +300,7 @@ public class PerformSkill implements Runnable {
                             def.init(j);
                             def = def.applyModifier(j);
                             double d = e.length * (1.0 - def.getAttr(Attr.DEBUFF_RESISTANCE) / 100.0);
-                            riseAPI.addEffect(state, j, e.effectType, (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100) * (1.0 + 0.3 * state.getAttr(Attr.SKILL_LEVEL)), e.level, d);
+                            riseAPI.addEffect(j, e.effectType, (1.0 + state.getAttr(Attr.DEBUFF_EFFECT) / 100) * (1.0 + 0.3 * state.getAttr(Attr.SKILL_LEVEL)), e.level, d);
                         }
                         break;
                     }

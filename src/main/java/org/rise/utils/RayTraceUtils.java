@@ -12,6 +12,10 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 
+/***
+ * 射线追踪模块
+ * 用就完事了
+ */
 public class RayTraceUtils {
     public static Location rayTraceBlock(Location start, Vector direction, double maxDistance) {
         World world = start.getWorld();

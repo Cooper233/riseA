@@ -3,12 +3,15 @@ package org.rise.team;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.rise.utils.RandNumUtils;
 
 import java.util.*;
+//TODO: 这玩意有bug
 
 public class TeamBase {
-    public static Map<UUID, UUID> belonging = new HashMap<>();
-    public static Map<UUID, List<UUID>> teamInfo = new HashMap<>();
+    public static Map<UUID, Integer> belonging = new HashMap<>();
+    public static Map<Integer, List<UUID>> teamInfo = new HashMap<>();
+    public static Map<Integer, UUID> teamLeader = new HashMap<>();
 
     public static class request {
         public int type;//0：加入小队  1：邀请加入
@@ -24,18 +27,18 @@ public class TeamBase {
 
     public static Map<UUID, request> teamRequest = new HashMap<>();
 
-    public static UUID getNowTeam(Player player) {
-        return belonging.getOrDefault(player.getUniqueId(), null);
+    public static int getNowTeam(Player player) {
+        return belonging.getOrDefault(player.getUniqueId(), -1);
     }
 
     public static void leaveTeam(Player player) {
-        UUID t = getNowTeam(player);
-        if (t == null) return;
+        int t = getNowTeam(player);
+        if (t == -1) return;
         List<UUID> tmp = teamInfo.get(t);
-        if (t == player.getUniqueId()) {
+        if (teamLeader.get(t) == player.getUniqueId()) {
             List<UUID> tt = new LinkedList<>(tmp);
             for (UUID i : tt) {
-                if (i == t) continue;
+                if (i == player.getUniqueId()) continue;
                 leaveTeam(Bukkit.getPlayer(i));
             }
             player.sendMessage("§6[§fISAAC§6]§f你已不在小队中。");
@@ -46,37 +49,41 @@ public class TeamBase {
         if (tmp.size() > 1) {
             teamInfo.put(t, tmp);
         } else teamInfo.remove(t);
-        Bukkit.getPlayer(t).sendMessage("§6[§fISAAC§6]§f特工 " + player.getDisplayName() + " §f已离开你的小队。");
-        player.sendMessage("§6[§fISAAC§6]§f已离开 " + player.getDisplayName() + " §f的小队。");
+        Bukkit.getPlayer(teamLeader.get(t)).sendMessage("§6[§fISAAC§6]§f特工 " + player.getDisplayName() + " §f已离开你的小队。");
+        player.sendMessage("§6[§fISAAC§6]§f已离开 " + Bukkit.getPlayer(teamLeader.get(t)).getDisplayName() + " §f的小队。");
         belonging.remove(player.getUniqueId());
     }
 
     public static void joinTeam(Player self, Player tar) {
-        List<UUID> tmp = teamInfo.get(tar.getUniqueId());
-        if (tmp == null) {
+        int t = getNowTeam(self);
+        if (t != -1) {
+            self.sendMessage("§6[§fISAAC§6]§c当前已在小队中，无法加入!");
+            return;
+        }
+        t = getNowTeam(tar);
+        List<UUID> tmp;
+        if (t == -1) {
+            t = RandNumUtils.getRand(1, 20000);
+            while (teamInfo.containsKey(t)) t = RandNumUtils.getRand(1, 20000);
             tmp = new LinkedList<>();
             tmp.add(tar.getUniqueId());
-            belonging.put(tar.getUniqueId(), tar.getUniqueId());
-        }
-        teamInfo.remove(self.getUniqueId());
+            belonging.put(tar.getUniqueId(), t);
+        } else tmp = teamInfo.get(t);
+        teamInfo.remove(t);
         tmp.add(self.getUniqueId());
-        teamInfo.put(tar.getUniqueId(), tmp);
-        belonging.put(self.getUniqueId(), tar.getUniqueId());
+        teamInfo.put(t, tmp);
+        belonging.put(self.getUniqueId(), t);
         self.sendMessage("§6[§fISAAC§6]§f已加入 " + tar.getDisplayName() + " §f的小队。");
     }
 
     public static void sendJoinRequest(Player self, Player tar) {
         String ori = tar.getDisplayName();
-        if (!teamInfo.containsKey(tar.getUniqueId())) {
-            for (UUID i : teamInfo.keySet()) {
-                List<UUID> tmp = teamInfo.get(i);
-                if (tmp.contains(tar.getUniqueId())) {
-                    tar = Bukkit.getPlayer(i);
-                    if (tmp.size() == 4) {
-                        self.sendMessage("§6[§fISAAC§6]§c请求失败！当前申请的小队人数已达到上限");
-                    }
-                    break;
-                }
+        int t = belonging.get(tar.getUniqueId());
+        if (t != -1) {
+            List<UUID> tmp = teamInfo.get(t);
+            tar = Bukkit.getPlayer(teamLeader.get(t));
+            if (tmp.size() == 4) {
+                self.sendMessage("§6[§fISAAC§6]§c请求失败！当前申请的小队人数已达到上限");
             }
         }
         if (teamRequest.containsKey(tar.getUniqueId())) {
@@ -96,12 +103,15 @@ public class TeamBase {
             tar.sendMessage("§6[§fISAAC§6]§f特工 " + self.getDisplayName() + " §f已在一个小队中，无法进行邀请。");
             return;
         }
-        List<UUID> tmp = teamInfo.get(self.getUniqueId());
-        if (tmp == null) tmp = new LinkedList<>();
-        if (tmp.size() == 4) {
-            self.sendMessage("§6[§fISAAC§6]§c请求失败！当前小队人数已达到上限！");
+        int t = belonging.get(self.getUniqueId());
+        List<UUID> tmp;
+        if (t != -1) {
+            tmp = teamInfo.get(t);
+            if (tmp.size() == 4) {
+                self.sendMessage("§6[§fISAAC§6]§c请求失败！当前小队人数已达到上限！");
+            }
         }
-        if (tmp.contains(tar.getUniqueId())) {
+        if (belonging.get(tar.getUniqueId()) != -1) {
             self.sendMessage("§6[§fISAAC§6]§c请求失败！当前特工已在小队中！");
         }
         if (teamRequest.containsKey(tar.getUniqueId())) {

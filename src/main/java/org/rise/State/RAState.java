@@ -109,7 +109,6 @@ public class RAState implements Cloneable {
     public Map<PotionEffectType, Integer> potions = new HashMap<>();
     public Map<String, Integer> suit = new HashMap<>();
     public Map<String, Boolean> type = new HashMap<>();
-    //TODO: 把叠层，buff，属性修改器等非解析元素移动到EntityInf里，作为单独的数据项，不随RAState改动
     public List<TalentType> activeTalent = new LinkedList<>();
 
     public void AllDefault() {
@@ -677,11 +676,10 @@ public class RAState implements Cloneable {
             for (Attr i : riseA.attrName.keySet()) {
                 String s = riseA.attrName.get(i);
                 if (s == null) tp.sendRawMessage("" + i);
+                else
                 if (tmp.contains(s)) {
-//                    if(level==2){
-//                        tp.sendMessage(""+s+" "+res);
-//                    }
-                    state.addAttr(i, res);
+                    if (i == NON_HEADSHOT) state.setAttr(NON_HEADSHOT, 1);
+                    else state.addAttr(i, res);
                 }
             }
         }

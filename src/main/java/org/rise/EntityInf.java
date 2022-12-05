@@ -12,6 +12,10 @@ import org.rise.effect.CustomEffectBase;
 
 import java.util.*;
 
+/***
+ * 实体相关信息
+ * 大部分都是变量名已经说明了一切
+ */
 public class EntityInf {
     public static Map<UUID, UUID> revivingMap = new HashMap<>();//救助者-被救助者
     public static Map<UUID, UUID> revivingMapReflect = new HashMap<>();//被救助者-救助者

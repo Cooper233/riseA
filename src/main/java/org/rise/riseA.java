@@ -183,6 +183,9 @@ riseA extends JavaPlugin implements Listener {
     ;
     public static Map<Player, playerSelectData> CaliDataMap = new HashMap<>();
 
+    /***
+     * 重载配置文件
+     */
     public void configReload() {
         reloadConfig();
         skills.clear();
@@ -386,6 +389,7 @@ riseA extends JavaPlugin implements Listener {
             if (args.length == 0) {
                 sender.sendMessage("riseA已启用");
             } else {
+                //打开模块菜单
                 if (args.length == 1 && Objects.equals(args[0], "mod")) {
                     if (sender instanceof Player) {
                         if (!ModuleGui.guiList.containsKey(((Player) sender).getUniqueId())) {
@@ -395,6 +399,7 @@ riseA extends JavaPlugin implements Listener {
                     }
                     return true;
                 }
+                //改装手中物品（不推荐）
                 if (Objects.equals(args[0], "rf")) {
                     Player player = (Player) sender;
                     org.bukkit.inventory.ItemStack s = player.getEquipment().getItemInMainHand();
@@ -403,13 +408,15 @@ riseA extends JavaPlugin implements Listener {
                     player.getEquipment().setItemInMainHand(s);
                     return true;
                 }
+                //队伍相关
                 if (Objects.equals(args[0], "team")) {
                     Player player = (Player) sender;
                     if (args.length == 1) {
-                        if (TeamBase.getNowTeam(player) == null) {
+                        if (TeamBase.getNowTeam(player) == -1) {
                             player.sendMessage("§6[§fISAAC§6]§c>>§f你目前不在小队中");
                         } else {
-                            Player t = Bukkit.getPlayer(TeamBase.getNowTeam(player));
+                            int t1 = TeamBase.getNowTeam(player);
+                            Player t = Bukkit.getPlayer(TeamBase.teamLeader.get(t1));
                             player.sendMessage("§6[§fISAAC§6]§b>>§f小队信息");
                             player.sendMessage("§f队长：" + t.getDisplayName());
                             player.sendMessage("§6>>§f小队成员");
@@ -471,6 +478,7 @@ riseA extends JavaPlugin implements Listener {
                 if (args.length == 1 && Objects.equals(args[0], "reload")) {
                     configReload();
                 }
+                //维克的测试
                 if (args.length == 2 && Objects.equals(args[0], "vict")) {
                     if (!sender.isOp()) return false;
                     org.bukkit.inventory.ItemStack a = ((Player) sender).getInventory().getItemInMainHand();
@@ -510,9 +518,11 @@ riseA extends JavaPlugin implements Listener {
                     PlayerInventory inv = ((Player) sender).getInventory();
                     inv.setItemInMainHand(a);
                 }
+                //给予自身30秒的额外生命值
                 if (args.length == 2 && Objects.equals(args[0], "exhp")) {
                     ExtraHp.addExHp(EntityInf.getEntityExtraHp((Entity) sender), new ExtraHp(Double.parseDouble(args[1]), 30000), (Entity) sender);
                 }
+                //指令释放技能
                 if (Objects.equals(args[0], "s")) {
                     if (args.length == 2) {
                         Player player = (Player) sender;
@@ -523,6 +533,7 @@ riseA extends JavaPlugin implements Listener {
                         SkillAPI.performSkill(player, getSkill(args[1]), false);
                     }
                 }
+                //使手上物品带上绑定标签
                 if (Objects.equals(args[0], "b")) {
                     Player player = (Player) sender;
                     if (player.getEquipment().getItemInMainHand() == null || player.getEquipment().getItemInMainHand().getType() == Material.AIR)
@@ -537,6 +548,7 @@ riseA extends JavaPlugin implements Listener {
                     item.setItemMeta(meta);
                     player.getEquipment().setItemInMainHand(item);
                 }
+                //导入配置文件
                 if (Objects.equals(args[0], "ip")) {
                     Player player = (Player) sender;
                     EntityEquipment equip = player.getEquipment();
@@ -556,6 +568,7 @@ riseA extends JavaPlugin implements Listener {
                         e.printStackTrace();
                     }
                 }
+                //导出配置文件中的物品
                 if (Objects.equals(args[0], "ex")) {
                     Player player = (Player) sender;
                     Inventory inv = player.getInventory();
@@ -580,10 +593,12 @@ riseA extends JavaPlugin implements Listener {
                     if (item == null) return false;
                     inv.addItem(item);
                 }
+                //使玩家倒地
                 if (Objects.equals(args[0], "d")) {
                     riseAPI.setPlayerDowned(Bukkit.getPlayer(args[1]));
                     Bukkit.getPlayer(args[1]).setHealth(Bukkit.getPlayer(args[1]).getMaxHealth());
                 }
+                //移除范围内实体
                 if (Objects.equals(args[0], "removeE")) {
                     double dx1 = Double.parseDouble(args[1]), dy1 = Double.parseDouble(args[2]), dz1 = Double.parseDouble(args[3]);
                     double dx2 = Double.parseDouble(args[4]), dy2 = Double.parseDouble(args[5]), dz2 = Double.parseDouble(args[6]);
@@ -601,6 +616,7 @@ riseA extends JavaPlugin implements Listener {
                     }
                     return true;
                 }
+                //设置单个方块
                 if (Objects.equals(args[0], "setblock")) {
                     int num = 1;
                     if (args.length == 7) {
@@ -614,30 +630,36 @@ riseA extends JavaPlugin implements Listener {
                     if (num == 2) block.setData(Byte.parseByte(args[2]));
                     return true;
                 }
+                //打开进阶菜单
                 if (Objects.equals(args[0], "vt")) {
                     testgui.test((Player) sender);
                     return true;
                 }
+                //没用
                 if (Objects.equals(args[0], "vtd")) {
                     testgui.test1((Player) sender);
                     return true;
                 }
+                //储存校准数据
                 if (Objects.equals(args[0], "sc")) {
                     CalibrationData.saveToFile((Player) sender);
                     return true;
                 }
+                //打开校准-提取
                 if (Objects.equals(args[0], "cet")) {
                     if (args.length == 2) {
                         TypeSelectGUI.open(Bukkit.getPlayer(args[1]));
                     } else TypeSelectGUI.open((Player) sender);
                     return true;
                 }
+                //打开校准-注入
                 if (Objects.equals(args[0], "cit")) {
                     if (args.length == 2) {
                         org.rise.GUI.calibrationInject.TypeSelectGUI.open(Bukkit.getPlayer(args[1]));
                     } else org.rise.GUI.calibrationInject.TypeSelectGUI.open((Player) sender);
                     return true;
                 }
+                //维克的设置装备的测试
                 if (Objects.equals(args[0], "vt1")) {
                     net.minecraft.server.v1_12_R1.Entity iplayer;
                     CraftEntity c = (CraftEntity) sender;
@@ -676,6 +698,7 @@ riseA extends JavaPlugin implements Listener {
                         e.printStackTrace();
                     }
                 }
+                //使全服玩家带上干扰效果
                 if (Objects.equals(args[0], "emp")) {
                     TargetBase t1 = TargetBase.SELF;
                     List<EffectBase> eff = new LinkedList<>();
